@@ -33,7 +33,9 @@ export type VariableValue =
   | string[]
 
 export type GraphResponse = {
-  tree: DataNode[]
+  tree: {
+    nodes: DataNode[]
+  }
 }
 
 export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
@@ -41,11 +43,11 @@ export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
 
   const getData = async () => {
     const api = await createAuthApi(getToken)
-    return api.get('/graph').then((res) => res.data)
+    return api.get('/tree').then((res) => res.data)
   }
 
   return useQuery({
-    queryKey: ['graph'],
+    queryKey: ['tree'],
     queryFn: getData
   })
 }

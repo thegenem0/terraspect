@@ -41,7 +41,7 @@ export const TreeContextProvider = ({ children }: Props) => {
     }
 
     if (data) {
-      setTreeData(data.tree)
+      setTreeData(data.tree.nodes)
     }
   }, [data, queryLoading, queryFetching, isError])
 
