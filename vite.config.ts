@@ -7,15 +7,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    eslintPlugin(),
-    tsconfigPaths(),
-    TanStackRouterVite()
-  ],
+  plugins: [react(), eslintPlugin(), tsconfigPaths(), TanStackRouterVite()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, 'src')
     }
   }
 })

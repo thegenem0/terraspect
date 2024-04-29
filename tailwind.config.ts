@@ -9,7 +9,7 @@ const config = {
       screens: {
         '2xl': '1400px'
       }
-    },
+    }
   },
   plugins: []
 } satisfies Config
