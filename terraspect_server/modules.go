@@ -17,7 +17,6 @@ func initModules() (*Modules, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	return &Modules{
 		DB: db,

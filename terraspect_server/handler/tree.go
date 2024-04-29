@@ -19,5 +19,7 @@ func (h *Handler) GetTree(c *gin.Context) {
 }
 
 func (h *Handler) PostTree(c *gin.Context) {
-
+	c.JSON(200, gin.H{
+		"message": "OK",
+	})
 }

@@ -29,15 +29,6 @@ func NewHandler(c *Config) {
 
 	g := c.R.Group(c.BaseURL)
 
-	// if gin.Mode() != gin.TestMode {
-	// 	g.Use(middleware.Timeout(c.TimeoutDuration, apperrors.NewServiceUnavailable()))
-	// 	g.GET("/me", middleware.AuthUser(h.TokenService), h.Me)
-	// 	g.POST("/signout", middleware.AuthUser(h.TokenService), h.Signout)
-	// 	g.PUT("/details", middleware.AuthUser(h.TokenService), h.Details)
-	// 	g.POST("/image", middleware.AuthUser(h.TokenService), h.Image)
-	// 	g.DELETE("/image", middleware.AuthUser(h.TokenService), h.DeleteImage)
-	// } else {
-
 	g.OPTIONS("/tree", h.OptionsTree)
 	g.GET("/tree", middleware.AuthMiddleware(c.AuthService), h.GetTree)
 

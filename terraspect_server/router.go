@@ -12,13 +12,16 @@ import (
 
 func InitRouter(modules *Modules) (*gin.Engine, error) {
 
-	clerk, err := clerk.NewClient("sk_test_pEEsJt9JKgFJwcHtRYImJISLfqt92SOhLUksVv0g3N")
+	clerkClient, err := clerk.NewClient("sk_test_pEEsJt9JKgFJwcHtRYImJISLfqt92SOhLUksVv0g3N")
 	if err != nil {
 		return nil, err
 	}
 
-	authRepo := repository.NewAuthRepository(clerk)
+	authRepo := repository.NewAuthRepository(clerkClient)
 	authService := service.NewAuthService(authRepo)
+
+	treeRepo := repository.NewTreeRepository(modules.DB)
+	treeService := service.NewTreeService(treeRepo)
 
 	router := gin.Default()
 
@@ -27,6 +30,7 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 	handler.NewHandler(&handler.Config{
 		R:               router,
 		AuthService:     authService,
+		TreeService:     treeService,
 		BaseURL:         baseURL,
 		TimeoutDuration: time.Duration(time.Duration(5) * time.Second),
 	})
