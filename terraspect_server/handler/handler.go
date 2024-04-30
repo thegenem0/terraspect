@@ -9,7 +9,7 @@ import (
 )
 
 type Handler struct {
-	AUthService service.AuthService
+	AuthService service.AuthService
 	TreeService service.TreeService
 }
 
@@ -17,7 +17,8 @@ type Config struct {
 	R               *gin.Engine
 	AuthService     service.AuthService
 	TreeService     service.TreeService
-	BaseURL         string
+	WebBaseURL      string
+	ApiBaseURL      string
 	TimeoutDuration time.Duration
 	MaxBodyBytes    int64
 }
@@ -25,11 +26,16 @@ type Config struct {
 func NewHandler(c *Config) {
 	h := &Handler{
 		TreeService: c.TreeService,
+		AuthService: c.AuthService,
 	}
 
-	g := c.R.Group(c.BaseURL)
+	webGroup := c.R.Group(c.WebBaseURL)
+	_ = c.R.Group(c.ApiBaseURL)
 
-	g.OPTIONS("/tree", h.OptionsTree)
-	g.GET("/tree", middleware.AuthMiddleware(c.AuthService), h.GetTree)
+	webGroup.OPTIONS("/apikey", h.OptionsAuth)
+	webGroup.POST("/apikey", middleware.ClerkMiddleware(c.AuthService), h.PostApiKey)
+
+	webGroup.OPTIONS("/tree", h.OptionsTree)
+	webGroup.GET("/tree", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
 
 }

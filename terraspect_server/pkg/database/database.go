@@ -1,14 +1,13 @@
 package database
 
 import (
-	"github.com/thegenem0/terraspect_server/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type IDBModule interface {
 	Close() error
-	SyncDatabase() error
+	SyncDatabase(models []interface{}) error
 	Connection() *gorm.DB
 }
 
@@ -39,8 +38,8 @@ func (dbs *DBModule) Close() error {
 	return sqlDB.Close()
 }
 
-func (dbs *DBModule) SyncDatabase() error {
-	for _, model := range []interface{}{&model.Plan{}} {
+func (dbs *DBModule) SyncDatabase(models []interface{}) error {
+	for _, model := range models {
 		err := dbs.connection.AutoMigrate(model)
 		if err != nil {
 			return err

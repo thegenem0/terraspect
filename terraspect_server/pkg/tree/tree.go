@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"fmt"
 	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
@@ -14,7 +13,6 @@ type TreeModule struct {
 
 func BuildTree(rootModule *tfjson.StateModule) (TreeData, error) {
 	reflectorService := reflector.NewReflectorModule()
-	fmt.Println(reflectorService)
 
 	var createNode func(*tfjson.StateModule, string, bool) PlanNodeData
 

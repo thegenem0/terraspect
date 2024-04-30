@@ -1,14 +1,13 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/thegenem0/terraspect_server/service"
 )
 
-type authHeader struct {
+type clerkAuthHeader struct {
 	IDToken string `header:"Authorization"`
 }
 
@@ -19,15 +18,13 @@ type invalidArgument struct {
 	Param string `json:"param"`
 }
 
-func AuthMiddleware(s service.AuthService) gin.HandlerFunc {
+func ClerkMiddleware(s service.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		h := authHeader{}
+		h := clerkAuthHeader{}
 		err := c.ShouldBindHeader(&h)
 		if err != nil {
 			return
 		}
-
-		fmt.Println("ID_TOKEN: ", h.IDToken)
 
 		idTokenHeader := strings.Split(h.IDToken, "Bearer ")
 
@@ -40,7 +37,6 @@ func AuthMiddleware(s service.AuthService) gin.HandlerFunc {
 			return
 		}
 
-		// validate ID token here
 		_, err = s.VerifyToken(idTokenHeader[1])
 
 		if err != nil {

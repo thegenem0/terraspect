@@ -17,7 +17,7 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 		return nil, err
 	}
 
-	authRepo := repository.NewAuthRepository(clerkClient)
+	authRepo := repository.NewAuthRepository(clerkClient, modules.DB)
 	authService := service.NewAuthService(authRepo)
 
 	treeRepo := repository.NewTreeRepository(modules.DB)
@@ -25,14 +25,16 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 
 	router := gin.Default()
 
-	baseURL := "/api/v1"
+	webBaseURL := "/api/v1/web"
+	apiBaseUrl := "/api/v1/api"
 
 	handler.NewHandler(&handler.Config{
 		R:               router,
 		AuthService:     authService,
 		TreeService:     treeService,
-		BaseURL:         baseURL,
-		TimeoutDuration: time.Duration(time.Duration(5) * time.Second),
+		WebBaseURL:      webBaseURL,
+		ApiBaseURL:      apiBaseUrl,
+		TimeoutDuration: time.Duration(5) * time.Second,
 	})
 
 	return router, nil
