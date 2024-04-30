@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 )
 
 type IDBModule interface {
@@ -16,7 +18,13 @@ type DBModule struct {
 }
 
 func NewDBModule() (*DBModule, error) {
-	connString := "host=localhost user=terraspect_root password=SuperSecretPassword dbname=terraspect_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	host := os.Getenv("DATABASE_HOST")
+	dbName := os.Getenv("DATABASE_NAME")
+	user := os.Getenv("DATABASE_USER")
+	password := os.Getenv("DATABASE_PASSWORD")
+
+	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Asia/Shanghai", host, user, password, dbName)
+
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  connString,
 		PreferSimpleProtocol: true,

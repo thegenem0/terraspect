@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - .data/postgresql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=SuperSecretPassword
+      - POSTGRES_USER=terraspect_root
+      - POSTGRES_DB=terraspect_db
+    networks:
+      - terraspect-network
+
+  api:
+    build:
+      context: ./terraspect_server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./terraspect_server:/app
+    environment:
+      - GO_ENV=development
+      - GOPROXY=direct
+      - DATABASE_HOST=postgres
+      - DATABASE_NAME=terraspect_db
+      - DATABASE_USER=terraspect_root
+      - DATABASE_PASSWORD=SuperSecretPassword
+    depends_on:
+      - postgres
+    networks:
+      - terraspect-network
+
+  web:
+    build:
+      context: ./terraspect_web
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./terraspect_web:/app
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - api
+    networks:
+      - terraspect-network
+
+networks:
+  terraspect-network:
+    driver: bridge
