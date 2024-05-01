@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/thegenem0/terraspect_server/model/apierror"
 	"github.com/thegenem0/terraspect_server/service"
 )
 
@@ -15,19 +15,33 @@ func ApiMiddleware(s service.AuthService) gin.HandlerFunc {
 		h := apiAuthHeader{}
 		err := c.ShouldBindHeader(&h)
 		if err != nil {
-			return
-		}
-
-		clerkUserId, err := s.GetUserByAPIKey(h.ApiKey)
-		if err != nil {
-			c.JSON(401, gin.H{
-				"error": "API key verification failed",
+			apiErr := apierror.NewAPIError(
+				apierror.InternalServerError,
+				"Failed to bind header",
+			)
+			c.JSON(apiErr.Status(), gin.H{
+				"error": apiErr,
 			})
 
 			c.Abort()
 			return
 		}
-		fmt.Println("CLERK_USER_ID: ", clerkUserId)
+
+		clerkUserId, err := s.GetUserByAPIKey(h.ApiKey)
+		if err != nil {
+			apiErr := apierror.NewAPIError(
+				apierror.APIKeyVerificationFailed,
+				"API key verification failed",
+			)
+			c.JSON(apiErr.Status(), gin.H{
+				"error": apiErr,
+			})
+
+			c.Abort()
+			return
+		}
+
+		c.Set("clerkUserId", clerkUserId)
 
 		c.Next()
 	}

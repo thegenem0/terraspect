@@ -6,11 +6,9 @@ type ApiProps = {
 
 type GetJWT = () => Promise<string | null>
 
-export type Api = ReturnType<typeof terraspectAPI>
-
 const terraspectAPI = ({ jwt }: ApiProps) =>
   axios.create({
-    baseURL: `http://localhost:8080/api/v1/`,
+    baseURL: `http://localhost:8000/api/web/v1`,
     timeout: 10000,
     headers: {
       Authorization: `Bearer ${jwt}`

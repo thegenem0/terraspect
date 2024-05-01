@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type Plan struct {
 	gorm.Model
-	ID            uint
+	UserID        uint `gorm:"primaryKey"`
 	TerraformPlan []byte
 }

@@ -1,47 +1,104 @@
 package service
 
 import (
-	"fmt"
+	"errors"
+	"github.com/clerkinc/clerk-sdk-go/clerk"
+	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/google/uuid"
 	"github.com/thegenem0/terraspect_server/repository"
 )
 
 type AuthService interface {
-	VerifyToken(token string) (bool, error)
 	GetUserID(token string) (string, error)
 	GetUserByAPIKey(apiKey string) (string, error)
 	GenerateAPIKey() (string, error)
 }
 
+type UserData struct {
+	ID                    string               `json:"id"`
+	Username              *string              `json:"username"`
+	FirstName             *string              `json:"first_name"`
+	LastName              *string              `json:"last_name"`
+	ProfileImageURL       string               `json:"profile_image_url"`
+	PrimaryEmailAddressID *string              `json:"primary_email_address_id"`
+	EmailAddresses        []clerk.EmailAddress `json:"email_addresses"`
+}
+
 type authService struct {
-	AuthRepository repository.AuthRepository
+	clerkClient    clerk.Client
+	userRepository repository.UserRepository
+	userData       *UserData
 }
 
-func NewAuthService(authRepository repository.AuthRepository) AuthService {
+func NewAuthService(
+	clerkClient clerk.Client,
+	userRepository repository.UserRepository,
+) AuthService {
 	return &authService{
-		AuthRepository: authRepository,
+		clerkClient:    clerkClient,
+		userRepository: userRepository,
 	}
 }
 
-func (as *authService) VerifyToken(token string) (bool, error) {
-	err := as.AuthRepository.AuthenticateToken(token)
+func (as *authService) getClerkSession(token string) (*clerk.SessionClaims, error) {
+	session, err := as.clerkClient.VerifyToken(token)
+
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return as.AuthRepository.GetUserData().ID != "", nil
+	if session == nil {
+		return nil, errors.New("INVALID_TOKEN")
+	}
+
+	return session, nil
+}
+
+func (as *authService) getClerkUserData(claims jwt.Claims) (*UserData, error) {
+	user, err := as.clerkClient.Users().Read(claims.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	userData := &UserData{
+		ID:                    user.ID,
+		Username:              user.Username,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		ProfileImageURL:       user.ProfileImageURL,
+		PrimaryEmailAddressID: user.PrimaryEmailAddressID,
+		EmailAddresses:        user.EmailAddresses,
+	}
+	return userData, nil
 }
 
 func (as *authService) GetUserID(token string) (string, error) {
-	if as.AuthRepository.GetUserData().ID == "" {
-		return "", fmt.Errorf("User not found")
+	session, err := as.getClerkSession(token)
+	if err != nil {
+		return "", err
 	}
-	return as.AuthRepository.GetUserData().ID, nil
+
+	userData, err := as.getClerkUserData(session.Claims)
+	if err != nil {
+		return "", err
+	}
+
+	as.userData = userData
+
+	return userData.ID, nil
 }
 
 func (as *authService) GetUserByAPIKey(apiKey string) (string, error) {
-	return as.AuthRepository.GetUserByAPIKey(apiKey)
+	return as.userRepository.GetClerkIDFromAPIKey(apiKey)
 }
 
 func (as *authService) GenerateAPIKey() (string, error) {
-	return as.AuthRepository.GenerateAPIKey()
+	apiKey := uuid.New().String()
+
+	err := as.userRepository.AddAPIKeyToUser(as.userData.ID, apiKey)
+	if err != nil {
+		return "", err
+	}
+
+	return apiKey, nil
 }

@@ -6,6 +6,7 @@ type User struct {
 	gorm.Model
 	ClerkUserID string
 	ApiKeys     []ApiKey `gorm:"foreignKey:UserID"`
+	Plans       []Plan   `gorm:"foreignKey:UserID"`
 }
 
 type ApiKey struct {

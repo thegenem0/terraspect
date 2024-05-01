@@ -27,6 +27,7 @@ services:
       - DATABASE_NAME=terraspect_db
       - DATABASE_USER=terraspect_root
       - DATABASE_PASSWORD=SuperSecretPassword
+      - CLERK_API_KEY=sk_test_pEEsJt9JKgFJwcHtRYImJISLfqt92SOhLUksVv0g3N
     depends_on:
       - postgres
     networks:

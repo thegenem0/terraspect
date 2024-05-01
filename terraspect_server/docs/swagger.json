@@ -1,0 +1,34 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/web/v1/apikey": {
+            "post": {
+                "description": "Generate an API key",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate an API key",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "options": {
+                "description": "Options for auth",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Options for auth",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}

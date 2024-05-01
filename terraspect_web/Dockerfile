@@ -1,9 +1,6 @@
 FROM node:18-alpine AS dev
 
-
 WORKDIR /app
-
-RUN npm install -g yarn
 
 COPY package.json package-lock.json* yarn.lock* ./
 

@@ -1,0 +1,21 @@
+info:
+  contact: {}
+paths:
+  /web/v1/apikey:
+    options:
+      description: Options for auth
+      responses:
+        "200":
+          description: OK
+      summary: Options for auth
+      tags:
+      - Auth
+    post:
+      description: Generate an API key
+      responses:
+        "200":
+          description: OK
+      summary: Generate an API key
+      tags:
+      - Auth
+swagger: "2.0"
