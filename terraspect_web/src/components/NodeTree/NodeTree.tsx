@@ -7,7 +7,7 @@ import Graph from 'graphology'
 import { useEffect } from 'react'
 
 import { useTreeContext } from '@/contexts/TreeContextProvider'
-import { DataNode, Variable } from '@/hooks/useGraphQuery'
+import { DataNode, VariableResponse } from '@/hooks/queries/useGraphQuery'
 
 type GraphNode = {
   id: string
@@ -16,7 +16,7 @@ type GraphNode = {
   size: number
   label: string
   children?: GraphNode[]
-  variables?: Variable[]
+  variables?: VariableResponse
 }
 
 interface LoadGraphProps {
@@ -55,8 +55,7 @@ export const LoadGraph = ({ data }: LoadGraphProps) => {
         x: posX,
         y: posY,
         size: 40 / (level + 1),
-        label: node.label,
-        variables: node.variables
+        label: node.label
       })
 
       if (parentNodeId) {
@@ -77,6 +76,7 @@ export const LoadGraph = ({ data }: LoadGraphProps) => {
         })
       }
     }
+
     for (const node of data) {
       const graphNode = {
         id: node.id,
@@ -84,7 +84,6 @@ export const LoadGraph = ({ data }: LoadGraphProps) => {
         y: Math.random() * 10000,
         size: 30,
         label: node.label,
-        variables: node.variables,
         children: node.children
       }
       addNodesRecursively(graphNode, graph)

@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as authenticatedImport } from './routes/__authenticated'
 import { Route as IndexImport } from './routes/index'
+import { Route as authenticatedKeysImport } from './routes/__authenticated/keys'
 import { Route as authenticatedGraphImport } from './routes/__authenticated/graph'
 
 // Create/Update Routes
@@ -25,6 +26,11 @@ const authenticatedRoute = authenticatedImport.update({
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const authenticatedKeysRoute = authenticatedKeysImport.update({
+  path: '/keys',
+  getParentRoute: () => authenticatedRoute,
 } as any)
 
 const authenticatedGraphRoute = authenticatedGraphImport.update({
@@ -48,6 +54,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedGraphImport
       parentRoute: typeof authenticatedImport
     }
+    '/__authenticated/keys': {
+      preLoaderRoute: typeof authenticatedKeysImport
+      parentRoute: typeof authenticatedImport
+    }
   }
 }
 
@@ -55,7 +65,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
-  authenticatedRoute.addChildren([authenticatedGraphRoute]),
+  authenticatedRoute.addChildren([
+    authenticatedGraphRoute,
+    authenticatedKeysRoute,
+  ]),
 ])
 
 /* prettier-ignore-end */

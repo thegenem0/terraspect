@@ -12,25 +12,19 @@ export type DataNode = {
 }
 
 export type VariableResponse = {
-  simple_values: Variable[]
-  complex_values: Variable[]
+  simple_values: SimpleVariable[]
+  complex_values: ComplexVariable[]
 }
 
-export type Variable = {
+export type SimpleVariable = {
   key: string
-  value: VariableValue
+  value: string | object
 }
 
-export type KVPair<TKey, TValue> = {
-  key: TKey
-  value: TValue
+export type ComplexVariable = {
+  key: string
+  value: SimpleVariable[]
 }
-
-export type VariableValue =
-  | string
-  | number
-  | KVPair<string, string>[]
-  | string[]
 
 export type GraphResponse = {
   tree: {
@@ -38,7 +32,11 @@ export type GraphResponse = {
   }
 }
 
-export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
+export const useGraphQuery = ({
+  enabled = true
+}: {
+  enabled?: boolean
+}): UseQueryResult<GraphResponse> => {
   const { getToken } = useAuth()
 
   const getData = async () => {
@@ -48,6 +46,7 @@ export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
 
   return useQuery({
     queryKey: ['tree'],
-    queryFn: getData
+    queryFn: getData,
+    enabled: enabled
   })
 }

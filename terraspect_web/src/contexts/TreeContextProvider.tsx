@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { DataNode, useGraphQuery } from '@/hooks/useGraphQuery'
+import { DataNode, useGraphQuery } from '@/hooks/queries/useGraphQuery'
 
 export type TreeContext = {
   treeData: DataNode[]
   isLoading: boolean
   activeNode: DataNode | undefined
   toggleActiveNodeById: (id: string) => void
+  refreshTree: () => void
 }
 
 export const TreeContext = createContext<TreeContext>({} as TreeContext)
@@ -27,7 +28,7 @@ export const TreeContextProvider = ({ children }: Props) => {
     isLoading: queryLoading,
     isFetching: queryFetching,
     isError
-  } = useGraphQuery()
+  } = useGraphQuery({ enabled: treeData.length === 0 })
 
   useEffect(() => {
     if (queryLoading || queryFetching) {
@@ -74,11 +75,16 @@ export const TreeContextProvider = ({ children }: Props) => {
     }
   }
 
+  const refreshTree = () => {
+    setTreeData([])
+  }
+
   const treeContext = {
     treeData,
     isLoading,
     activeNode,
-    toggleActiveNodeById
+    toggleActiveNodeById,
+    refreshTree
   }
 
   return (

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import DetailsPanel from '@/components/DetailsPanel/DetailsPanel'
 import { DisplayGraph } from '@/components/NodeTree/NodeTree'
+import DetailsDialog from '@/components/pages/Graph/DetailsDialog/DetailsDialog'
 import { TreeContextProvider } from '@/contexts/TreeContextProvider'
 
 export const Route = createFileRoute('/__authenticated/graph')({
@@ -12,14 +12,11 @@ const GraphComponent = () => {
   return (
     <TreeContextProvider>
       <div className="flex h-full flex-row gap-4">
-        <div className="w-9/12 overflow-hidden">
+        <div className="w-full overflow-hidden">
           <DisplayGraph />
         </div>
-        <div className="w-3/12 overflow-auto">
-          <DetailsPanel />
-        </div>
+        <DetailsDialog />
       </div>
     </TreeContextProvider>
   )
 }
-
