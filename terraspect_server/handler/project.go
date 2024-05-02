@@ -147,6 +147,18 @@ func (h *Handler) GetProjectPlanById(c *gin.Context) {
 }
 
 func (h *Handler) PostProjectPlan(c *gin.Context) {
+	apiKey, exists := c.Get("apiKey")
+	if !exists {
+		apiErr := apierror.NewAPIError(
+			apierror.APIKeyVerificationFailed,
+			"User has no valid session",
+		)
+		c.JSON(apiErr.Status(), gin.H{
+			"error": apiErr,
+		})
+		return
+	}
+
 	file, err := c.FormFile("plan_file")
 	if err != nil {
 		apiErr := apierror.NewAPIError(
@@ -159,20 +171,7 @@ func (h *Handler) PostProjectPlan(c *gin.Context) {
 		return
 	}
 
-	projectId := c.PostForm("project_id")
-	if projectId == "" {
-		apiErr := apierror.NewAPIError(
-			apierror.NoProjectName,
-			"No project name provided",
-		)
-
-		c.JSON(apiErr.Status(), gin.H{
-			"message": apiErr,
-		})
-		return
-	}
-
-	err = h.ProjectService.AddPlanToProject(projectId, file)
+	err = h.ProjectService.AddPlanToProject(apiKey.(string), file)
 	if err != nil {
 		apiErr := apierror.NewAPIError(
 			apierror.InternalServerError,

@@ -121,7 +121,12 @@ func (ps *projectService) GetPlanByID(projectId string, planId string) (dto.Plan
 	return response, nil
 }
 
-func (ps *projectService) AddPlanToProject(projectID string, file *multipart.FileHeader) error {
+func (ps *projectService) AddPlanToProject(apiKey string, file *multipart.FileHeader) error {
+	project, err := ps.projectRepository.GetProjectByAPIKey(apiKey)
+	if err != nil {
+		return err
+	}
+
 	contents, err := file.Open()
 	if err != nil {
 		return err
@@ -147,5 +152,5 @@ func (ps *projectService) AddPlanToProject(projectID string, file *multipart.Fil
 	planModel := &model.Plan{
 		TerraformPlan: fileData,
 	}
-	return ps.projectRepository.AddPlanToProject(projectID, *planModel)
+	return ps.projectRepository.AddPlanToProject(project.ID, *planModel)
 }

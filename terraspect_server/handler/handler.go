@@ -45,9 +45,6 @@ func NewHandler(c *Config) {
 	webGroup.POST("/apikey", middleware.ClerkMiddleware(c.AuthService), h.PostApiKey)
 	webGroup.POST("/apikey/delete", middleware.ClerkMiddleware(c.AuthService), h.DeleteApiKey)
 
-	webGroup.OPTIONS("/tree/:projectId/*planId", h.OptionsTree)
-	webGroup.GET("/tree/:projectId/*planId", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
-
 	webGroup.OPTIONS("/projects", h.OptionsProject)
 	webGroup.GET("/projects", middleware.ClerkMiddleware(c.AuthService), h.GetAllProjects)
 	webGroup.POST("/projects", middleware.ClerkMiddleware(c.AuthService), h.PostProject)
@@ -60,6 +57,9 @@ func NewHandler(c *Config) {
 
 	webGroup.OPTIONS("/projects/:projectId/plans/:planId", h.OptionsProject)
 	webGroup.GET("/projects/:projectId/plans/:planId", middleware.ClerkMiddleware(c.AuthService), h.GetProjectPlanById)
+
+	webGroup.OPTIONS("/projects/:projectId/plans/:planId/graph", h.OptionsTree)
+	webGroup.GET("/projects/:projectId/plans/:planId/graph", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
 
 	apiGroup.OPTIONS("/upload", h.OptionsProject)
 	apiGroup.POST("/upload", middleware.ApiMiddleware(c.AuthService), h.PostProjectPlan)

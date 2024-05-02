@@ -8,6 +8,7 @@ import (
 type ProjectRepository interface {
 	CreateProject(clerkUserID string, project model.Project) error
 	GetProjectByID(projectID string) (model.Project, error)
+	GetProjectByAPIKey(apiKey string) (model.Project, error)
 	GetAllProjectsByUser(clerkUserId string) ([]model.Project, error)
 	UpdateProject(project model.Project) error
 	DeleteProject(projectID string) error
@@ -47,6 +48,22 @@ func (pr *projectRepository) CreateProject(clerkUserID string, project model.Pro
 func (pr *projectRepository) GetProjectByID(projectID string) (model.Project, error) {
 	var project model.Project
 	result := pr.db.Connection().Where("id = ?", projectID).First(&project)
+	if result.Error != nil {
+		return model.Project{}, result.Error
+	}
+
+	return project, nil
+}
+
+func (pr *projectRepository) GetProjectByAPIKey(apiKey string) (model.Project, error) {
+	var apiKeyModel model.ApiKey
+	result := pr.db.Connection().Where("key = ?", apiKey).First(&apiKeyModel)
+	if result.Error != nil {
+		return model.Project{}, result.Error
+	}
+
+	var project model.Project
+	result = pr.db.Connection().Where("id = ?", apiKeyModel.ProjectID).First(&project)
 	if result.Error != nil {
 		return model.Project{}, result.Error
 	}

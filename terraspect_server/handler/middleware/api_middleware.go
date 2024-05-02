@@ -42,6 +42,7 @@ func ApiMiddleware(s service.AuthService) gin.HandlerFunc {
 		}
 
 		c.Set("clerkUserId", clerkUserId)
+		c.Set("apiKey", h.ApiKey)
 
 		c.Next()
 	}
