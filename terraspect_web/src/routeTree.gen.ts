@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as authenticatedImport } from './routes/__authenticated'
 import { Route as IndexImport } from './routes/index'
+import { Route as authenticatedProjectsImport } from './routes/__authenticated/projects'
 import { Route as authenticatedKeysImport } from './routes/__authenticated/keys'
 import { Route as authenticatedGraphImport } from './routes/__authenticated/graph'
 
@@ -26,6 +27,11 @@ const authenticatedRoute = authenticatedImport.update({
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const authenticatedProjectsRoute = authenticatedProjectsImport.update({
+  path: '/projects',
+  getParentRoute: () => authenticatedRoute,
 } as any)
 
 const authenticatedKeysRoute = authenticatedKeysImport.update({
@@ -58,6 +64,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedKeysImport
       parentRoute: typeof authenticatedImport
     }
+    '/__authenticated/projects': {
+      preLoaderRoute: typeof authenticatedProjectsImport
+      parentRoute: typeof authenticatedImport
+    }
   }
 }
 
@@ -68,6 +78,7 @@ export const routeTree = rootRoute.addChildren([
   authenticatedRoute.addChildren([
     authenticatedGraphRoute,
     authenticatedKeysRoute,
+    authenticatedProjectsRoute,
   ]),
 ])
 

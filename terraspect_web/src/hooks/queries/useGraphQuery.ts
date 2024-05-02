@@ -32,17 +32,26 @@ export type GraphResponse = {
   }
 }
 
-export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
+type GraphQueryParams = {
+  projectId?: string
+  planId?: string
+}
+
+export const useGraphQuery = ({
+  projectId,
+  planId
+}: GraphQueryParams): UseQueryResult<GraphResponse> => {
   const { getToken } = useAuth()
 
   const getData = async () => {
     const api = await createAuthApi(getToken)
-    return api.get('/tree').then((res) => res.data)
+    return api.get(`/tree/${projectId}/${planId}`).then((res) => res.data)
   }
 
   return useQuery({
     queryKey: ['tree'],
     queryFn: getData,
-    staleTime: Infinity
+    staleTime: Infinity,
+    enabled: !!projectId && !!planId
   })
 }

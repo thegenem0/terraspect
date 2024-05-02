@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PopoverClose } from '@radix-ui/react-popover'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -14,11 +13,23 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from '@/components/ui/sheet'
 import { useGenerateKeyMutation } from '@/hooks/mutations/useGenerateKeyMutation'
+import { useAllProjectsQuery } from '@/hooks/queries/useAllProjectsQuery'
 
 export const NewApiKeyValidationSchema = z.object({
   name: z.string({
@@ -26,6 +37,9 @@ export const NewApiKeyValidationSchema = z.object({
   }),
   description: z.string({
     message: 'Description is required'
+  }),
+  projectId: z.string({
+    message: 'Project is required'
   })
 })
 
@@ -44,11 +58,15 @@ const CreateKeyPopover = () => {
   }
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="default">New Key</Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-96 border border-black">
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="default">Create Key</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>name</SheetTitle>
+          <SheetDescription>Desc</SheetDescription>
+        </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-2">
             <FormField
@@ -77,14 +95,57 @@ const CreateKeyPopover = () => {
                 </FormItem>
               )}
             />
-            <PopoverClose asChild>
+            <ProjectSelector form={form} />
+            <SheetClose asChild>
               <Button type="submit">Submit</Button>
-            </PopoverClose>
+            </SheetClose>
           </form>
         </Form>
-      </PopoverContent>
-    </Popover>
+      </SheetContent>
+    </Sheet>
   )
 }
 
 export default CreateKeyPopover
+
+type ProjectSelectorProps = {
+  form: ReturnType<typeof useForm<z.infer<typeof NewApiKeyValidationSchema>>>
+}
+
+const ProjectSelector = ({ form }: ProjectSelectorProps) => {
+  const { data, isLoading } = useAllProjectsQuery()
+
+  return (
+    <FormField
+      control={form.control}
+      name="projectId"
+      render={({ field }) => (
+        <FormItem className="flex flex-col pb-6">
+          <FormLabel>Project</FormLabel>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Project" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Loading..." disabled>
+                {isLoading ? 'Loading...' : 'Select Project'}
+              </SelectItem>
+              {data?.projects && data.projects.length > 0 && !isLoading ? (
+                data.projects.map((project) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="none" disabled>
+                  No projects found
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}

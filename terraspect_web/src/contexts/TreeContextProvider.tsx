@@ -39,7 +39,7 @@ export const TreeContextProvider = ({ children }: Props) => {
     data,
     isLoading: queryLoading,
     isFetching: queryFetching
-  } = useGraphQuery()
+  } = useGraphQuery({ projectId: '1' })
 
   useEffect(() => {
     if (queryLoading || queryFetching) {
