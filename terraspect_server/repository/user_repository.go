@@ -3,14 +3,13 @@ package repository
 import (
 	"fmt"
 	"github.com/thegenem0/terraspect_server/model"
+	"github.com/thegenem0/terraspect_server/model/dto"
 	"github.com/thegenem0/terraspect_server/pkg/database"
 )
 
 type UserRepository interface {
-	GetClerkIDFromAPIKey(apiKey string) (string, error)
-	AddAPIKeyToUser(clerkUserID string, apiKey string, name string, description string) error
-	AddPlanToUser(clerkUserID string, plan model.Plan) error
-	GetLatestPlan(clerkUserID string) (model.Plan, error)
+	GetUserFromAPIKey(apiKey string) (model.User, error)
+	AddAPIKey(clerkUserID string, apiKey string, data dto.GenerateApiKeyRequest) error
 	GetAllAPIKeys(clerkUserID string) ([]model.ApiKey, error)
 	DeleteAPIKey(apiKey string) error
 }
@@ -27,40 +26,44 @@ func NewUserRepository(
 	}
 }
 
-func (ur *userRepository) GetClerkIDFromAPIKey(apiKey string) (string, error) {
+func (ur *userRepository) GetUserFromAPIKey(apiKey string) (model.User, error) {
 	var apiKeyModel model.ApiKey
 	result := ur.db.Connection().Where("key = ?", apiKey).First(&apiKeyModel)
 	if result.Error != nil {
-		return "", result.Error
+		return model.User{}, result.Error
 	}
 
 	var user model.User
 	result = ur.db.Connection().Where("id = ?", apiKeyModel.UserID).First(&user)
 	if result.Error != nil {
-		return "", result.Error
+		return model.User{}, result.Error
 	}
 
 	if user.ClerkUserID == "" {
-		return "", result.Error
+		return model.User{}, fmt.Errorf("user not found")
 	}
 
-	return user.ClerkUserID, nil
+	return user, nil
 }
 
-func (ur *userRepository) AddAPIKeyToUser(clerkUserID string, apiKey string, name string, description string) error {
+func (ur *userRepository) AddAPIKey(clerkUserID string, apiKey string, data dto.GenerateApiKeyRequest) error {
 	var user model.User
-	result := ur.db.Connection().FirstOrCreate(&user, model.User{
-		ClerkUserID: clerkUserID,
-	})
+	result := ur.db.Connection().First(&user, "clerk_user_id = ?", clerkUserID)
+	if result.Error != nil {
+		return result.Error
+	}
 
+	var project model.Project
+	result = ur.db.Connection().First(&project, "id = ?", data.ProjectId)
 	if result.Error != nil {
 		return result.Error
 	}
 
 	newApiKey := model.ApiKey{
-		Name:        name,
-		Description: description,
+		Name:        data.Name,
+		Description: data.Description,
 		Key:         apiKey,
+		Project:     project,
 		UserID:      user.ID,
 	}
 
@@ -70,38 +73,6 @@ func (ur *userRepository) AddAPIKeyToUser(clerkUserID string, apiKey string, nam
 	}
 
 	return nil
-}
-
-func (ur *userRepository) AddPlanToUser(clerkUserID string, plan model.Plan) error {
-	var user model.User
-	result := ur.db.Connection().Where("clerk_user_id = ?", clerkUserID).First(&user)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	plan.UserID = user.ID
-
-	if err := ur.db.Connection().Create(&plan).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (ur *userRepository) GetLatestPlan(clerkUserID string) (model.Plan, error) {
-	var user model.User
-	result := ur.db.Connection().Where("clerk_user_id = ?", clerkUserID).First(&user)
-	if result.Error != nil {
-		return model.Plan{}, result.Error
-	}
-
-	var plan model.Plan
-	result = ur.db.Connection().Where("user_id = ?", user.ID).Last(&plan)
-	if result.Error != nil {
-		return model.Plan{}, result.Error
-	}
-
-	return plan, nil
 }
 
 func (ur *userRepository) GetAllAPIKeys(clerkUserID string) ([]model.ApiKey, error) {

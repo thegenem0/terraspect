@@ -28,10 +28,12 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 	}
 
 	userRepo := repository.NewUserRepository(modules.DB)
+	projectRepo := repository.NewProjectRepository(modules.DB)
 
 	authService := service.NewAuthService(clerkClient, userRepo)
-	uploadService := service.NewUploadService(userRepo)
-	treeService := service.NewTreeService(userRepo)
+	uploadService := service.NewUploadService(userRepo, projectRepo)
+	treeService := service.NewTreeService(userRepo, projectRepo)
+	projectService := service.NewProjectService(projectRepo)
 
 	router := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api"
@@ -44,6 +46,7 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 	handler.NewHandler(&handler.Config{
 		R:               router,
 		AuthService:     authService,
+		ProjectService:  projectService,
 		TreeService:     treeService,
 		UploadService:   uploadService,
 		WebBaseURL:      webBaseURL,

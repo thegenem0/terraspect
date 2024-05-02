@@ -9,14 +9,16 @@ import (
 )
 
 type Handler struct {
-	AuthService   service.AuthService
-	TreeService   service.TreeService
-	UploadService service.UploadService
+	AuthService    service.AuthService
+	ProjectService service.ProjectService
+	TreeService    service.TreeService
+	UploadService  service.UploadService
 }
 
 type Config struct {
 	R               *gin.Engine
 	AuthService     service.AuthService
+	ProjectService  service.ProjectService
 	TreeService     service.TreeService
 	UploadService   service.UploadService
 	WebBaseURL      string
@@ -27,9 +29,10 @@ type Config struct {
 
 func NewHandler(c *Config) {
 	h := &Handler{
-		TreeService:   c.TreeService,
-		AuthService:   c.AuthService,
-		UploadService: c.UploadService,
+		AuthService:    c.AuthService,
+		ProjectService: c.ProjectService,
+		TreeService:    c.TreeService,
+		UploadService:  c.UploadService,
 	}
 
 	webGroup := c.R.Group(c.WebBaseURL)
@@ -42,9 +45,22 @@ func NewHandler(c *Config) {
 	webGroup.POST("/apikey", middleware.ClerkMiddleware(c.AuthService), h.PostApiKey)
 	webGroup.POST("/apikey/delete", middleware.ClerkMiddleware(c.AuthService), h.DeleteApiKey)
 
-	webGroup.OPTIONS("/tree", h.OptionsTree)
-	webGroup.GET("/tree", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
+	webGroup.OPTIONS("/tree/:projectId/*planId", h.OptionsTree)
+	webGroup.GET("/tree/:projectId/*planId", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
 
-	apiGroup.OPTIONS("/upload", h.OptionsUpload)
-	apiGroup.POST("/upload", middleware.ApiMiddleware(c.AuthService), h.PostUpload)
+	webGroup.OPTIONS("/projects", h.OptionsProject)
+	webGroup.GET("/projects", middleware.ClerkMiddleware(c.AuthService), h.GetAllProjects)
+	webGroup.POST("/projects", middleware.ClerkMiddleware(c.AuthService), h.PostProject)
+
+	webGroup.OPTIONS("/projects/:projectId", h.OptionsProject)
+	webGroup.GET("/projects/:projectId", middleware.ClerkMiddleware(c.AuthService), h.GetProject)
+
+	webGroup.OPTIONS("/projects/:projectId/plans", h.OptionsProject)
+	webGroup.GET("/projects/:projectId/plans", middleware.ClerkMiddleware(c.AuthService), h.GetProjectPlans)
+
+	webGroup.OPTIONS("/projects/:projectId/plans/:planId", h.OptionsProject)
+	webGroup.GET("/projects/:projectId/plans/:planId", middleware.ClerkMiddleware(c.AuthService), h.GetProjectPlanById)
+
+	apiGroup.OPTIONS("/upload", h.OptionsProject)
+	apiGroup.POST("/upload", middleware.ApiMiddleware(c.AuthService), h.PostProjectPlan)
 }

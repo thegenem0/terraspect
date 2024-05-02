@@ -3,13 +3,9 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thegenem0/terraspect_server/model/apierror"
+	"github.com/thegenem0/terraspect_server/model/dto"
 	"net/http"
 )
-
-type GenerateApiKeyBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
 
 type DeleteApiKeyBody struct {
 	Key string `json:"key"`
@@ -79,7 +75,7 @@ func (h *Handler) PostApiKey(c *gin.Context) {
 		return
 	}
 
-	var body GenerateApiKeyBody
+	var body dto.GenerateApiKeyRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		apiErr := apierror.NewAPIError(
 			apierror.BadRequest,
@@ -91,7 +87,7 @@ func (h *Handler) PostApiKey(c *gin.Context) {
 		return
 	}
 
-	apiKey, err := h.AuthService.GenerateAPIKey(body.Name, body.Description)
+	apiKey, err := h.AuthService.GenerateAPIKey(body)
 	if err != nil {
 		apiErr := apierror.NewAPIError(
 			apierror.InternalServerError,

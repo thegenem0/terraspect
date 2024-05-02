@@ -13,23 +13,14 @@ func (h *Handler) OptionsTree(c *gin.Context) {
 }
 
 func (h *Handler) GetTree(c *gin.Context) {
-	clerkUserId, exists := c.Get("clerkUserId")
-	if !exists {
-		apiErr := apierror.NewAPIError(
-			apierror.TokenVerificationFailed,
-			"User has no valid session",
-		)
-		c.JSON(apiErr.Status(), gin.H{
-			"error": apiErr,
-		})
-		return
-	}
+	projectId := c.Param("projectId")
+	planId := c.Param("planId")
 
-	tree, err := h.TreeService.BuildTree(clerkUserId.(string))
+	tree, err := h.TreeService.BuildTree(projectId, planId)
 	if err != nil {
 		apiErr := apierror.NewAPIError(
-			apierror.InternalServerError,
-			"Failed to build tree",
+			apierror.BadRequest,
+			"Incorrect project ID provided",
 		)
 		c.JSON(apiErr.Status(), gin.H{
 			"error": apiErr,

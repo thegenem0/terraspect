@@ -23,6 +23,7 @@ func initModules() (*Modules, error) {
 		model.Plan{},
 		model.User{},
 		model.ApiKey{},
+		model.Project{},
 	})
 	if err != nil {
 		return nil, err

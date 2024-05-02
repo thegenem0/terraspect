@@ -9,21 +9,26 @@ import (
 )
 
 type TreeService interface {
-	BuildTree(clerkUserId string) (tree.TreeData, error)
+	BuildTree(projectId string, planId string) (tree.TreeData, error)
 }
 
 type treeService struct {
-	userRepository repository.UserRepository
+	userRepository    repository.UserRepository
+	projectRepository repository.ProjectRepository
 }
 
-func NewTreeService(ur repository.UserRepository) TreeService {
+func NewTreeService(
+	ur repository.UserRepository,
+	pr repository.ProjectRepository,
+) TreeService {
 	return &treeService{
-		userRepository: ur,
+		userRepository:    ur,
+		projectRepository: pr,
 	}
 }
 
-func (ts *treeService) BuildTree(clerkUserId string) (tree.TreeData, error) {
-	plan, err := ts.userRepository.GetLatestPlan(clerkUserId)
+func (ts *treeService) BuildTree(projectId string, planId string) (tree.TreeData, error) {
+	plan, err := ts.projectRepository.GetPlanByID(projectId, planId)
 	if err != nil {
 		return tree.TreeData{}, err
 	}

@@ -27,7 +27,7 @@ func ApiMiddleware(s service.AuthService) gin.HandlerFunc {
 			return
 		}
 
-		clerkUserId, err := s.GetUserByAPIKey(h.ApiKey)
+		clerkUserId, err := s.GetClerkUserIDFromAPIKey(h.ApiKey)
 		if err != nil {
 			apiErr := apierror.NewAPIError(
 				apierror.APIKeyVerificationFailed,

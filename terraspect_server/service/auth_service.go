@@ -5,15 +5,15 @@ import (
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/google/uuid"
-	"github.com/thegenem0/terraspect_server/model"
+	"github.com/thegenem0/terraspect_server/model/dto"
 	"github.com/thegenem0/terraspect_server/repository"
 )
 
 type AuthService interface {
 	GetUserID(token string) (string, error)
-	GetUserByAPIKey(apiKey string) (string, error)
-	GenerateAPIKey(name string, description string) (string, error)
-	GetAPIKeys() ([]model.ApiKeyResponse, error)
+	GetClerkUserIDFromAPIKey(apiKey string) (string, error)
+	GenerateAPIKey(request dto.GenerateApiKeyRequest) (string, error)
+	GetAPIKeys() ([]dto.ApiKeyResponse, error)
 	DeleteAPIKey(apiKey string) error
 }
 
@@ -91,24 +91,30 @@ func (as *authService) GetUserID(token string) (string, error) {
 	return userData.ID, nil
 }
 
-func (as *authService) GetUserByAPIKey(apiKey string) (string, error) {
-	return as.userRepository.GetClerkIDFromAPIKey(apiKey)
+func (as *authService) GetClerkUserIDFromAPIKey(apiKey string) (string, error) {
+	user, err := as.userRepository.GetUserFromAPIKey(apiKey)
+	if err != nil {
+		return "", err
+	}
+
+	return user.ClerkUserID, nil
 }
 
-func (as *authService) GetAPIKeys() ([]model.ApiKeyResponse, error) {
+func (as *authService) GetAPIKeys() ([]dto.ApiKeyResponse, error) {
 	apiKeys, err := as.userRepository.GetAllAPIKeys(as.userData.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	var keys []model.ApiKeyResponse
+	var keys []dto.ApiKeyResponse
 
 	for _, apiKey := range apiKeys {
-		apiKeyResponse := model.ApiKeyResponse{
+		apiKeyResponse := dto.ApiKeyResponse{
 			ID:          apiKey.ID,
 			Name:        apiKey.Name,
 			Description: apiKey.Description,
 			Key:         apiKey.Key,
+			ProjectName: apiKey.Project.Name,
 			CreatedAt:   apiKey.CreatedAt.Format("2006-01-02 15:04:05"),
 		}
 		keys = append(keys, apiKeyResponse)
@@ -117,10 +123,10 @@ func (as *authService) GetAPIKeys() ([]model.ApiKeyResponse, error) {
 	return keys, nil
 }
 
-func (as *authService) GenerateAPIKey(name string, description string) (string, error) {
+func (as *authService) GenerateAPIKey(data dto.GenerateApiKeyRequest) (string, error) {
 	apiKey := uuid.New().String()
 
-	err := as.userRepository.AddAPIKeyToUser(as.userData.ID, apiKey, name, description)
+	err := as.userRepository.AddAPIKey(as.userData.ID, apiKey, data)
 	if err != nil {
 		return "", err
 	}
