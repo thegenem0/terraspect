@@ -32,7 +32,7 @@ export type GraphResponse = {
   }
 }
 
-type GraphQueryParams = {
+export type GraphQueryParams = {
   projectId?: string
   planId?: string
 }
@@ -45,7 +45,9 @@ export const useGraphQuery = ({
 
   const getData = async () => {
     const api = await createAuthApi(getToken)
-    return api.get(`/tree/${projectId}/${planId}`).then((res) => res.data)
+    return api
+      .get(`/projects/${projectId}/plans/${planId}/graph`)
+      .then((res) => res.data)
   }
 
   return useQuery({

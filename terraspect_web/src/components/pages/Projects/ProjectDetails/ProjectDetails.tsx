@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Edit, Eye, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet'
+import { useTreeContext } from '@/contexts/TreeContextProvider'
 import { Plan, useAllPlansQuery } from '@/hooks/queries/useAllPlansQuery'
 import { Project } from '@/hooks/queries/useAllProjectsQuery'
 
@@ -41,7 +42,9 @@ const ProjectDetails = ({ project, setProjectId }: ProjectDetailsProps) => {
               <PlanRowSkeleton key={index} />
             ))
           ) : data?.plans && data?.plans.length > 0 ? (
-            data.plans.map((plan) => <PlanRow key={plan.id} plan={plan} />)
+            data.plans.map((plan) => (
+              <PlanRow key={plan.id} projectId={project?.id} plan={plan} />
+            ))
           ) : (
             <PlanRowNoData />
           )}
@@ -53,7 +56,7 @@ const ProjectDetails = ({ project, setProjectId }: ProjectDetailsProps) => {
 
 export default ProjectDetails
 
-const PlanRow = ({ plan }: { plan: Plan }) => {
+const PlanRow = ({ projectId, plan }: { projectId?: string; plan: Plan }) => {
   return (
     <div className="my-4 grid grid-cols-4 items-center gap-2 rounded-lg border-2 border-black py-2">
       <Label htmlFor="name" className="text-right">
@@ -70,17 +73,23 @@ const PlanRow = ({ plan }: { plan: Plan }) => {
       />
       <div className="col-span-4 grid w-full grid-cols-1 place-items-center gap-2 px-2">
         <div className="flex flex-row gap-2">
-          <Link to="/plans/:id">
+          <Link
+            to="/graph"
+            search={{
+              planId: plan.id,
+              projectId
+            }}
+          >
             <Button type="button">
               <Eye size={16} />
             </Button>
           </Link>
-          <Link to="/plans/:id/edit">
+          <Link to="/">
             <Button type="button">
               <Edit size={16} />
             </Button>
           </Link>
-          <Link to="/plans/:id/delete">
+          <Link to="/">
             <Button type="button" variant="destructive">
               <Trash size={16} />
             </Button>

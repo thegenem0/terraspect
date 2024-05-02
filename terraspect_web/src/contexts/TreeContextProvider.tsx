@@ -12,7 +12,6 @@ import { DataNode, useGraphQuery } from '@/hooks/queries/useGraphQuery'
 
 export type TreeContext = {
   treeData: DataNode[]
-  isLoading: boolean
   activeNode: DataNode | undefined
   hoveredNodeId: string | undefined
   toggleActiveNodeById: (id: string) => void
@@ -25,11 +24,12 @@ export const TreeContext = createContext<TreeContext>({} as TreeContext)
 export const useTreeContext = () => useContext(TreeContext)
 
 type Props = {
+  projectId?: string
+  planId?: string
   children: React.ReactNode
 }
 
-export const TreeContextProvider = ({ children }: Props) => {
-  const [isLoading, setIsLoading] = useState(true)
+export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
   const [activeNode, setActiveNode] = useState<DataNode | undefined>()
   const [hoveredNodeId, setHoveredNodeId] = useState<string | undefined>()
 
@@ -38,21 +38,31 @@ export const TreeContextProvider = ({ children }: Props) => {
   const {
     data,
     isLoading: queryLoading,
-    isFetching: queryFetching
-  } = useGraphQuery({ projectId: '1' })
-
-  useEffect(() => {
-    if (queryLoading || queryFetching) {
-      setIsLoading(true)
-    } else {
-      setIsLoading(false)
-    }
-  }, [queryLoading, queryFetching])
+    isFetching: queryFetching,
+    refetch: refetchTree
+  } = useGraphQuery({
+    projectId,
+    planId
+  })
 
   const treeData = useMemo(() => {
-    if (!data) return []
-    return data.tree.nodes
+    if (!data?.tree?.nodes) {
+      const emptyNode = {
+        tree: {
+          nodes: []
+        }
+      }
+      return emptyNode.tree.nodes
+    } else {
+      return data?.tree.nodes
+    }
   }, [data])
+
+  useEffect(() => {
+    if (projectId && planId) {
+      refetchTree()
+    }
+  }, [projectId, planId, refetchTree])
 
   const findNodeById = useCallback(
     (id: string, nodes?: DataNode[]): DataNode | undefined => {
@@ -83,12 +93,15 @@ export const TreeContextProvider = ({ children }: Props) => {
 
   const treeContext = {
     treeData,
-    isLoading,
     activeNode,
     hoveredNodeId,
     toggleActiveNodeById,
     setHoveredNodeId,
     refreshTree
+  }
+
+  if (queryLoading || queryFetching) {
+    return <div>Loading...</div>
   }
 
   return (

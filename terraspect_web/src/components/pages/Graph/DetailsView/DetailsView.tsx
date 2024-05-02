@@ -11,31 +11,32 @@ type DetailsViewProps = {
 }
 
 const DetailsView = ({ activeNode }: DetailsViewProps) => {
-  const { simple_values, complex_values } = activeNode?.variables ?? {
-    simple_values: [],
-    complex_values: []
-  }
+  const { simple_values = [], complex_values = [] } =
+    activeNode?.variables ?? {}
 
   return (
     <div className="flex flex-row flex-wrap gap-6">
-      {!simple_values.length && !complex_values.length ? (
+      {!simple_values?.length && !complex_values?.length ? (
         <EmptyComponent />
       ) : (
         <>
           <div className="flex-1">
-            {simple_values.map((variable, idx) => (
-              <SimpleComponent key={idx} value={variable} />
-            ))}
+            {simple_values !== null && simple_values?.length > 0
+              ? simple_values.map((variable, idx) => (
+                  <SimpleComponent key={idx} value={variable} />
+                ))
+              : undefined}
           </div>
           <div className="flex-1">
-            {complex_values?.length > 0 &&
-              complex_values.map((variable, idx) => (
-                <ComplexComponent
-                  key={idx}
-                  groupName={variable.key}
-                  value={variable.value}
-                />
-              ))}
+            {complex_values != null && complex_values?.length > 0
+              ? complex_values.map((variable, idx) => (
+                  <ComplexComponent
+                    key={idx}
+                    groupName={variable.key}
+                    value={variable.value}
+                  />
+                ))
+              : undefined}
           </div>
         </>
       )}
