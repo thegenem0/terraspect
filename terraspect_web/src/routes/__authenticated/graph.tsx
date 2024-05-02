@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { DisplayGraph } from '@/components/NodeTree/NodeTree'
 import DetailsDialog from '@/components/pages/Graph/DetailsDialog/DetailsDialog'
+import { DisplayGraph } from '@/components/pages/Graph/NodeTree/NodeTree'
 import { TreeContextProvider } from '@/contexts/TreeContextProvider'
 
 export const Route = createFileRoute('/__authenticated/graph')({

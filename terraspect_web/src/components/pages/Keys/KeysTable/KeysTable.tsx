@@ -11,21 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-
-export type Key = {
-  id: string
-  name: string
-  description: string
-  value: string
-  createdAt: string
-  actions?: string
-}
+import { useDeleteKeyMutation } from '@/hooks/mutations/useDeleteKeyMutation'
+import { Key } from '@/hooks/queries/useGetKeysQuery'
 
 type KeysTableProps = {
-  data: Key[]
+  data?: Key[]
 }
 
 export function KeysTable({ data }: KeysTableProps) {
+  const { mutateAsync } = useDeleteKeyMutation()
+
+  const deleteKey = async (key: string) => {
+    await mutateAsync({ key }).then(() => {
+      console.log('Key deleted')
+    })
+  }
+
   const columns: ColumnDef<Key>[] = [
     {
       accessorKey: 'name',
@@ -36,7 +37,7 @@ export function KeysTable({ data }: KeysTableProps) {
       header: 'Description'
     },
     {
-      accessorKey: 'createdAt',
+      accessorKey: 'created_at',
       header: 'Created At'
     },
     {
@@ -54,14 +55,12 @@ export function KeysTable({ data }: KeysTableProps) {
             <DropdownMenuContent>
               <DropdownMenuLabel>Key Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onSelect={() => console.log('Copy Key', apiKey.value)}
+                onSelect={() => navigator.clipboard.writeText(apiKey.key)}
               >
                 Copy Key
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onSelect={() => console.log('View customer', apiKey.name)}
-              >
+              <DropdownMenuItem onSelect={() => deleteKey(apiKey.key)}>
                 Delete Key
               </DropdownMenuItem>
             </DropdownMenuContent>

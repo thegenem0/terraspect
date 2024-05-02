@@ -6,6 +6,8 @@ import {
 import Graph from 'graphology'
 import { useEffect } from 'react'
 
+import Splash from '@/components/common/Splash/Splash'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useTreeContext } from '@/contexts/TreeContextProvider'
 import { DataNode, VariableResponse } from '@/hooks/queries/useGraphQuery'
 
@@ -100,7 +102,7 @@ export const DisplayGraph = () => {
   const { treeData, isLoading } = useTreeContext()
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <Splash loading={isLoading} />
   }
 
   return (

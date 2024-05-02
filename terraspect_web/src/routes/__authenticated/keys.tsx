@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import PageContainer from '@/components/common/PageContainer/PageContainer'
+import CreateKeyPopover from '@/components/pages/Keys/CreateKeyPopover/CreateKeyPopover'
 import KeysTable from '@/components/pages/Keys/KeysTable/KeysTable'
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -9,50 +10,31 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import { useGetKeysQuery } from '@/hooks/queries/useGetKeysQuery'
 
 export const Route = createFileRoute('/__authenticated/keys')({
   component: () => <KeysComponent />
 })
 
 const KeysComponent = () => {
-  const keys = [
-    {
-      id: '1',
-      name: 'Key 1',
-      description: 'Key 1 Description',
-      value: 'key1',
-      createdAt: '2021-09-20'
-    },
-    {
-      id: '2',
-      name: 'Key 2',
-      description: 'Key 2 Description',
-      value: 'key2',
-      createdAt: '2021-09-21'
-    },
-    {
-      id: '3',
-      name: 'Key 3',
-      description: 'Key 3 Description',
-      value: 'key3',
-      createdAt: '2021-09-22'
-    }
-  ]
+  const { data } = useGetKeysQuery()
 
   return (
-    <div className="flex h-full flex-row justify-center gap-4">
-      <Card className="h-fit w-1/3 bg-slate-200">
-        <CardHeader className="flex flex-row justify-between">
-          <div>
-            <CardTitle>API Keys</CardTitle>
-            <CardDescription>Manage your API keys here.</CardDescription>
-          </div>
-          <Button variant="default">Create Key</Button>
-        </CardHeader>
-        <CardContent>
-          <KeysTable data={keys} />
-        </CardContent>
-      </Card>
-    </div>
+    <PageContainer className="w-3/4">
+      <div className="flex justify-center gap-4">
+        <Card className="h-fit w-full bg-slate-200">
+          <CardHeader className="flex flex-row justify-between">
+            <div>
+              <CardTitle>API Keys</CardTitle>
+              <CardDescription>Manage your API keys here.</CardDescription>
+            </div>
+            <CreateKeyPopover />
+          </CardHeader>
+          <CardContent>
+            <KeysTable data={data?.keys} />
+          </CardContent>
+        </Card>
+      </div>
+    </PageContainer>
   )
 }

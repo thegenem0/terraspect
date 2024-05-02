@@ -1,0 +1,29 @@
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, UseMutationResult } from '@tanstack/react-query'
+
+import { createAuthApi } from '@/api/useAPI'
+
+export type GenerateKeyResponse = {
+  key: string
+}
+
+const useGenerateKeyMutation = (): UseMutationResult<GenerateKeyResponse> => {
+  const { getToken } = useAuth()
+  const generateKey = async () => {
+    const api = await createAuthApi(getToken)
+    return api.post('/apikey').then((res) => res)
+  }
+  return useMutation({
+    mutationKey: ['generateKey'],
+    mutationFn: generateKey,
+    onError: (error) => {
+      console.log('error', error)
+    },
+
+    onSettled: () => {
+      console.log('onSettled')
+    }
+  })
+}
+
+export { useGenerateKeyMutation }

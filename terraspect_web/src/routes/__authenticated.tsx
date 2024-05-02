@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, SignIn } from '@clerk/clerk-react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import Header from '@/components/Header/Header'
+import Header from '@/components/common/Header/Header'
 
 export const Route = createFileRoute('/__authenticated')({
   component: () => <AuthenticatedLayout />
@@ -9,7 +9,7 @@ export const Route = createFileRoute('/__authenticated')({
 
 const AuthenticatedLayout = () => {
   return (
-    <>
+    <div className="flex size-full flex-col">
       <SignedOut>
         <SignIn />
       </SignedOut>
@@ -17,6 +17,6 @@ const AuthenticatedLayout = () => {
         <Header />
         <Outlet />
       </SignedIn>
-    </>
+    </div>
   )
 }
