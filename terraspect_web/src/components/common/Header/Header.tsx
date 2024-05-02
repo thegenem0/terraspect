@@ -19,7 +19,7 @@ const Header = () => {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Terraform</NavigationMenuTrigger>
+              <NavigationMenuTrigger>Infrastructure</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                   <Link to="/graph" className="no-underline">

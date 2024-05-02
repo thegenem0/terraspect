@@ -1,15 +1,18 @@
 import {
   ControlsContainer,
+  SearchControl,
   SigmaContainer,
   useLoadGraph,
   useRegisterEvents,
   useSetSettings,
-  useSigma
+  useSigma,
+  ZoomControl
 } from '@react-sigma/core'
 import { useLayoutCircular } from '@react-sigma/layout-circular'
 import { LayoutForceAtlas2Control } from '@react-sigma/layout-forceatlas2'
 import { useEffect } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { useTreeContext } from '@/contexts/TreeContextProvider'
 
 import { buildGraph, GraphEdge, GraphNode } from './graphBuilder'
@@ -81,6 +84,31 @@ const SetupGraph = () => {
   return null
 }
 
+const SigmaActions = () => {
+  const { assign: assignCircular } = useLayoutCircular()
+
+  return (
+    <ControlsContainer position="top-left" className="absolute left-10 top-20">
+      <div className="flex flex-row items-center gap-2">
+        <Button variant="destructive" onClick={() => assignCircular()}>
+          Reset
+        </Button>
+        <ZoomControl />
+        <LayoutForceAtlas2Control
+          settings={{
+            settings: {
+              slowDown: 10,
+              linLogMode: true,
+              adjustSizes: true,
+              outboundAttractionDistribution: true
+            }
+          }}
+        />
+      </div>
+    </ControlsContainer>
+  )
+}
+
 const GraphContainer = () => {
   return (
     <div className="size-full">
@@ -91,19 +119,12 @@ const GraphContainer = () => {
         style={{ height: '100%' }}
       >
         <SetupGraph />
+        <SigmaActions />
         <ControlsContainer
-          position="top-left"
-          className="absolute left-10 top-20"
+          position="top-right"
+          className="absolute right-10 top-20"
         >
-          <LayoutForceAtlas2Control
-            settings={{
-              settings: {
-                slowDown: 10,
-                linLogMode: true,
-                adjustSizes: true
-              }
-            }}
-          />
+          <SearchControl className="overflow-hidden rounded-lg border-2 border-black bg-white px-2 py-1 outline-none" />
         </ControlsContainer>
       </SigmaContainer>
     </div>
