@@ -32,11 +32,7 @@ export type GraphResponse = {
   }
 }
 
-export const useGraphQuery = ({
-  enabled = true
-}: {
-  enabled?: boolean
-}): UseQueryResult<GraphResponse> => {
+export const useGraphQuery = (): UseQueryResult<GraphResponse> => {
   const { getToken } = useAuth()
 
   const getData = async () => {
@@ -47,6 +43,6 @@ export const useGraphQuery = ({
   return useQuery({
     queryKey: ['tree'],
     queryFn: getData,
-    enabled: enabled
+    staleTime: Infinity
   })
 }

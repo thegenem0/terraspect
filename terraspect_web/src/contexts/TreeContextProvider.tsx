@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
 
 import { DataNode, useGraphQuery } from '@/hooks/queries/useGraphQuery'
 
@@ -6,7 +14,9 @@ export type TreeContext = {
   treeData: DataNode[]
   isLoading: boolean
   activeNode: DataNode | undefined
+  hoveredNodeId: string | undefined
   toggleActiveNodeById: (id: string) => void
+  setHoveredNodeId: (id?: string) => void
   refreshTree: () => void
 }
 
@@ -19,16 +29,17 @@ type Props = {
 }
 
 export const TreeContextProvider = ({ children }: Props) => {
-  const [treeData, setTreeData] = useState<DataNode[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeNode, setActiveNode] = useState<DataNode | undefined>()
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | undefined>()
+
+  const queryClient = useQueryClient()
 
   const {
     data,
     isLoading: queryLoading,
-    isFetching: queryFetching,
-    isError
-  } = useGraphQuery({ enabled: treeData.length === 0 })
+    isFetching: queryFetching
+  } = useGraphQuery()
 
   useEffect(() => {
     if (queryLoading || queryFetching) {
@@ -36,54 +47,47 @@ export const TreeContextProvider = ({ children }: Props) => {
     } else {
       setIsLoading(false)
     }
+  }, [queryLoading, queryFetching])
 
-    if ((!queryLoading && !queryFetching && isError) || !data) {
-      setTreeData([])
-    }
+  const treeData = useMemo(() => {
+    if (!data) return []
+    return data.tree.nodes
+  }, [data])
 
-    if (data) {
-      setTreeData(data.tree.nodes)
-    }
-  }, [data, queryLoading, queryFetching, isError])
-
-  const toggleActiveNodeById = (id: string) => {
-    const findNodeById = (
-      nodes: DataNode[],
-      id: string
-    ): DataNode | undefined => {
+  const findNodeById = useCallback(
+    (id: string, nodes?: DataNode[]): DataNode | undefined => {
+      if (!nodes) return undefined
       for (const node of nodes) {
-        if (node.id === id) {
-          return node
-        }
+        if (node.id === id) return node
         if (node.children) {
-          const found = findNodeById(node.children, id)
-          if (found) {
-            return found
-          }
+          const found = findNodeById(id, node.children)
+          if (found) return found
         }
       }
       return undefined
-    }
+    },
+    []
+  )
 
-    const node = findNodeById(treeData, id)
-    if (node) {
-      if (activeNode?.id === node.id) {
-        setActiveNode(undefined)
-      } else {
-        setActiveNode(node)
-      }
-    }
-  }
-
-  const refreshTree = () => {
-    setTreeData([])
-  }
+  const toggleActiveNodeById = useCallback(
+    (id: string) => {
+      setActiveNode((prev) =>
+        prev?.id === id ? undefined : findNodeById(id, data?.tree.nodes)
+      )
+    },
+    [findNodeById, data]
+  )
+  const refreshTree = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['tree'] })
+  }, [queryClient])
 
   const treeContext = {
     treeData,
     isLoading,
     activeNode,
+    hoveredNodeId,
     toggleActiveNodeById,
+    setHoveredNodeId,
     refreshTree
   }
 

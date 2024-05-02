@@ -18,26 +18,45 @@ const DetailsView = ({ activeNode }: DetailsViewProps) => {
 
   return (
     <div className="flex flex-row flex-wrap gap-6">
-      <div className="flex-1">
-        {simple_values.map((variable, idx) => (
-          <SimpleComponent key={idx} value={variable} />
-        ))}
-      </div>
-      <div className="flex-1">
-        {complex_values?.length > 0 &&
-          complex_values.map((variable, idx) => (
-            <ComplexComponent
-              key={idx}
-              groupName={variable.key}
-              value={variable.value}
-            />
-          ))}
-      </div>
+      {!simple_values.length && !complex_values.length ? (
+        <EmptyComponent />
+      ) : (
+        <>
+          <div className="flex-1">
+            {simple_values.map((variable, idx) => (
+              <SimpleComponent key={idx} value={variable} />
+            ))}
+          </div>
+          <div className="flex-1">
+            {complex_values?.length > 0 &&
+              complex_values.map((variable, idx) => (
+                <ComplexComponent
+                  key={idx}
+                  groupName={variable.key}
+                  value={variable.value}
+                />
+              ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
 
 export default DetailsView
+
+const EmptyComponent = () => {
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-gray-500">
+        This node does not have any variables associated with it.
+      </p>
+      <p className="text-sm text-gray-500">
+        Information may be available in the child nodes.
+      </p>
+    </div>
+  )
+}
 
 type SimpleComponentProps = {
   key?: number
