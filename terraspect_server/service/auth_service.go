@@ -5,13 +5,16 @@ import (
 	"github.com/clerkinc/clerk-sdk-go/clerk"
 	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/google/uuid"
+	"github.com/thegenem0/terraspect_server/model"
 	"github.com/thegenem0/terraspect_server/repository"
 )
 
 type AuthService interface {
 	GetUserID(token string) (string, error)
 	GetUserByAPIKey(apiKey string) (string, error)
-	GenerateAPIKey() (string, error)
+	GenerateAPIKey(name string, description string) (string, error)
+	GetAPIKeys() ([]model.ApiKeyResponse, error)
+	DeleteAPIKey(apiKey string) error
 }
 
 type UserData struct {
@@ -92,13 +95,39 @@ func (as *authService) GetUserByAPIKey(apiKey string) (string, error) {
 	return as.userRepository.GetClerkIDFromAPIKey(apiKey)
 }
 
-func (as *authService) GenerateAPIKey() (string, error) {
+func (as *authService) GetAPIKeys() ([]model.ApiKeyResponse, error) {
+	apiKeys, err := as.userRepository.GetAllAPIKeys(as.userData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var keys []model.ApiKeyResponse
+
+	for _, apiKey := range apiKeys {
+		apiKeyResponse := model.ApiKeyResponse{
+			ID:          apiKey.ID,
+			Name:        apiKey.Name,
+			Description: apiKey.Description,
+			Key:         apiKey.Key,
+			CreatedAt:   apiKey.CreatedAt.Format("2006-01-02 15:04:05"),
+		}
+		keys = append(keys, apiKeyResponse)
+	}
+
+	return keys, nil
+}
+
+func (as *authService) GenerateAPIKey(name string, description string) (string, error) {
 	apiKey := uuid.New().String()
 
-	err := as.userRepository.AddAPIKeyToUser(as.userData.ID, apiKey)
+	err := as.userRepository.AddAPIKeyToUser(as.userData.ID, apiKey, name, description)
 	if err != nil {
 		return "", err
 	}
 
 	return apiKey, nil
+}
+
+func (as *authService) DeleteAPIKey(apiKey string) error {
+	return as.userRepository.DeleteAPIKey(apiKey)
 }

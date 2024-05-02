@@ -36,8 +36,11 @@ func NewHandler(c *Config) {
 	apiGroup := c.R.Group(c.ApiBaseURL)
 
 	webGroup.OPTIONS("/apikey", h.OptionsAuth)
+	webGroup.OPTIONS("/apikey/delete", h.OptionsAuth)
 
+	webGroup.GET("/apikey", middleware.ClerkMiddleware(c.AuthService), h.GetAPIKeys)
 	webGroup.POST("/apikey", middleware.ClerkMiddleware(c.AuthService), h.PostApiKey)
+	webGroup.POST("/apikey/delete", middleware.ClerkMiddleware(c.AuthService), h.DeleteApiKey)
 
 	webGroup.OPTIONS("/tree", h.OptionsTree)
 	webGroup.GET("/tree", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
