@@ -4,10 +4,11 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion'
-import { DataNode, SimpleVariable } from '@/hooks/queries/useGraphQuery'
+import { TreeDataNode } from '@/contexts/TreeContextProvider'
+import { SimpleVariable } from '@/hooks/queries/useGraphQuery'
 
 type DetailsViewProps = {
-  activeNode?: DataNode
+  activeNode?: TreeDataNode
 }
 
 const DetailsView = ({ activeNode }: DetailsViewProps) => {

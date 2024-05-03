@@ -33,6 +33,27 @@ func (h *Handler) GetTree(c *gin.Context) {
 	})
 }
 
+func (h *Handler) GetChanges(c *gin.Context) {
+	projectId := c.Param("projectId")
+	planId := c.Param("planId")
+
+	changes, err := h.TreeService.BuildChanges(projectId, planId)
+	if err != nil {
+		apiErr := apierror.NewAPIError(
+			apierror.BadRequest,
+			"Incorrect project ID provided",
+		)
+		c.JSON(apiErr.Status(), gin.H{
+			"error": apiErr,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"changes": changes,
+	})
+}
+
 func (h *Handler) PostTree(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK",

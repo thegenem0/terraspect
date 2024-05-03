@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	tfjson "github.com/hashicorp/terraform-json"
+	"github.com/thegenem0/terraspect_server/pkg/change"
 	"github.com/thegenem0/terraspect_server/pkg/tree"
 	"github.com/thegenem0/terraspect_server/repository"
 )
 
 type TreeService interface {
 	BuildTree(projectId string, planId string) (tree.TreeData, error)
+	BuildChanges(projectId string, planId string) ([]change.Change, error)
 }
 
 type treeService struct {
@@ -47,4 +49,21 @@ func (ts *treeService) BuildTree(projectId string, planId string) (tree.TreeData
 	}
 
 	return treeData, nil
+}
+
+func (ts *treeService) BuildChanges(projectId string, planId string) ([]change.Change, error) {
+	plan, err := ts.projectRepository.GetPlanByID(projectId, planId)
+	if err != nil {
+		return []change.Change{}, err
+	}
+
+	var storedPlan *tfjson.Plan
+
+	err = json.Unmarshal(plan.TerraformPlan, &storedPlan)
+	if err != nil {
+		return []change.Change{},
+			fmt.Errorf("Failed to unmarshal plan: %s", err)
+	}
+
+	return change.BuildChanges(storedPlan.ResourceChanges), nil
 }

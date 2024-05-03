@@ -5,69 +5,32 @@ import (
 	"github.com/thegenem0/terraspect_server/pkg/reflector"
 )
 
-type IChangeModule interface {
-	GetResourceKeys() []ResourceKey
-	GetChanges() []Change
-	BuildChanges(changeData []*tfjson.ResourceChange)
-	IsValidKey(modKey string, key string) bool
-}
+func BuildChanges(changeData []*tfjson.ResourceChange) []Change {
+	ref := reflector.NewReflectorModule()
+	resources := make([]Change, 0)
 
-type ChangeModule struct {
-	reflectorService  reflector.IReflectorModule
-	validResourceKeys []ResourceKey
-	changes           []Change
-}
-
-func NewChangeModule(reflectorService reflector.IReflectorModule) *ChangeModule {
-	return &ChangeModule{
-		reflectorService:  reflectorService,
-		validResourceKeys: make([]ResourceKey, 0),
-		changes:           make([]Change, 0),
-	}
-}
-
-func (cs *ChangeModule) GetResourceKeys() []ResourceKey {
-	return cs.validResourceKeys
-}
-
-func (cs *ChangeModule) IsValidKey(modKey string, key string) bool {
-	for _, k := range cs.validResourceKeys {
-		if k.ModKey == modKey {
-			for _, v := range k.Keys {
-				if v == key {
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-
-func (cs *ChangeModule) GetChanges() []Change {
-	return cs.changes
-}
-
-func (cs *ChangeModule) BuildChanges(changeData []*tfjson.ResourceChange) {
 	for _, change := range changeData {
 		if change.Change.Actions.NoOp() {
 			continue
 		} else {
-			cs.addChangeResource(
+			resources = append(resources, addChangeResource(
 				change.Change.Actions,
 				change.Address,
 				change.PreviousAddress,
-				cs.reflectorService.HandleChanges(change.Change.Before, change.Change.After),
-			)
+				ref.HandleChanges(change.Change.Before, change.Change.After),
+			))
 		}
 	}
+
+	return resources
 }
 
-func (cs *ChangeModule) addChangeResource(
+func addChangeResource(
 	actions tfjson.Actions,
 	address string,
 	previousAddress string,
 	changes reflector.ChangeData,
-) {
+) Change {
 	change := ChangeItem{
 		Actions:         actions,
 		Address:         address,
@@ -75,8 +38,8 @@ func (cs *ChangeModule) addChangeResource(
 		Changes:         changes,
 	}
 
-	cs.changes = append(cs.changes, Change{
+	return Change{
 		ModKey:  address,
 		Changes: []ChangeItem{change},
-	})
+	}
 }

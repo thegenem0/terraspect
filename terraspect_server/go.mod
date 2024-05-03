@@ -3,6 +3,8 @@ module github.com/thegenem0/terraspect_server
 go 1.22
 
 require (
+	github.com/aws/aws-cdk-go/awscdk/v2 v2.140.0
+	github.com/aws/constructs-go/constructs/v10 v10.3.0
 	github.com/clerkinc/clerk-sdk-go v1.49.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-jose/go-jose/v3 v3.0.0
@@ -17,9 +19,14 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/aws/jsii-runtime-go v1.98.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
+	github.com/cdklabs/awscdk-asset-awscli-go/awscliv1/v2 v2.2.202 // indirect
+	github.com/cdklabs/awscdk-asset-kubectl-go/kubectlv20/v2 v2.1.2 // indirect
+	github.com/cdklabs/awscdk-asset-node-proxy-agent-go/nodeproxyagentv6/v2 v2.0.3 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect

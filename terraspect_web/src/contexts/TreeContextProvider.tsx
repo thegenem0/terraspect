@@ -8,11 +8,13 @@ import {
   useState
 } from 'react'
 
+import { ChangeItem, useChangesQuery } from '@/hooks/queries/useChangesQuerry'
 import { DataNode, useGraphQuery } from '@/hooks/queries/useGraphQuery'
+import { mergeChangesForModule } from '@/lib/mergeChangesForModule'
 
 export type TreeContext = {
-  treeData: DataNode[]
-  activeNode: DataNode | undefined
+  treeData: TreeDataNode[]
+  activeNode: TreeDataNode | undefined
   hoveredNodeId: string | undefined
   toggleActiveNodeById: (id: string) => void
   setHoveredNodeId: (id?: string) => void
@@ -23,6 +25,10 @@ export const TreeContext = createContext<TreeContext>({} as TreeContext)
 
 export const useTreeContext = () => useContext(TreeContext)
 
+export type TreeDataNode = DataNode & {
+  changes?: ChangeItem[]
+}
+
 type Props = {
   projectId?: string
   planId?: string
@@ -30,13 +36,13 @@ type Props = {
 }
 
 export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
-  const [activeNode, setActiveNode] = useState<DataNode | undefined>()
+  const [activeNode, setActiveNode] = useState<TreeDataNode | undefined>()
   const [hoveredNodeId, setHoveredNodeId] = useState<string | undefined>()
 
   const queryClient = useQueryClient()
 
   const {
-    data,
+    data: graphDataResult,
     isLoading: queryLoading,
     isFetching: queryFetching,
     refetch: refetchTree
@@ -45,27 +51,32 @@ export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
     planId
   })
 
-  const treeData = useMemo(() => {
-    if (!data?.tree?.nodes) {
-      const emptyNode = {
-        tree: {
-          nodes: []
-        }
-      }
-      return emptyNode.tree.nodes
-    } else {
-      return data?.tree.nodes
-    }
-  }, [data])
+  const {
+    data: changesDataResult,
+    isLoading: changesQueryLoading,
+    isFetching: changesQueryFetching,
+    refetch: refetchChanges
+  } = useChangesQuery({
+    projectId,
+    planId
+  })
+
+  const treeDataNodes = useMemo(() => {
+    const treeData = graphDataResult?.tree?.nodes || []
+    const changesData = changesDataResult?.changes || []
+
+    return mergeChangesForModule(treeData, changesData)
+  }, [graphDataResult, changesDataResult])
 
   useEffect(() => {
     if (projectId && planId) {
       refetchTree()
+      refetchChanges()
     }
-  }, [projectId, planId, refetchTree])
+  }, [projectId, planId, refetchTree, refetchChanges])
 
   const findNodeById = useCallback(
-    (id: string, nodes?: DataNode[]): DataNode | undefined => {
+    (id: string, nodes?: TreeDataNode[]): TreeDataNode | undefined => {
       if (!nodes) return undefined
       for (const node of nodes) {
         if (node.id === id) return node
@@ -82,17 +93,17 @@ export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
   const toggleActiveNodeById = useCallback(
     (id: string) => {
       setActiveNode((prev) =>
-        prev?.id === id ? undefined : findNodeById(id, data?.tree.nodes)
+        prev?.id === id ? undefined : findNodeById(id, treeDataNodes)
       )
     },
-    [findNodeById, data]
+    [findNodeById, treeDataNodes]
   )
   const refreshTree = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['tree'] })
+    queryClient.invalidateQueries({ queryKey: ['tree', 'changes'] })
   }, [queryClient])
 
   const treeContext = {
-    treeData,
+    treeData: treeDataNodes,
     activeNode,
     hoveredNodeId,
     toggleActiveNodeById,
@@ -100,7 +111,12 @@ export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
     refreshTree
   }
 
-  if (queryLoading || queryFetching) {
+  if (
+    queryLoading ||
+    queryFetching ||
+    changesQueryLoading ||
+    changesQueryFetching
+  ) {
     return <div>Loading...</div>
   }
 

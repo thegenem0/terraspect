@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //@ts-nocheck
 
-import { DataNode, KVPair } from '@/hooks/useGraphQuery'
+import { TreeDataNode } from '@/contexts/TreeContextProvider'
+import { KVPair } from '@/hooks/useGraphQuery'
 
 type ParsedVariables = {
   simpleValues: KVPair<string, string>[]
@@ -10,7 +11,7 @@ type ParsedVariables = {
 }
 
 export function ParseVariables(
-  activeNode?: DataNode
+  activeNode?: TreeDataNode
 ): ParsedVariables | undefined {
   if (!activeNode || !activeNode.variables) {
     return undefined // Return undefined if no activeNode or variables

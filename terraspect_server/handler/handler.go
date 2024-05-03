@@ -61,6 +61,9 @@ func NewHandler(c *Config) {
 	webGroup.OPTIONS("/projects/:projectId/plans/:planId/graph", h.OptionsTree)
 	webGroup.GET("/projects/:projectId/plans/:planId/graph", middleware.ClerkMiddleware(c.AuthService), h.GetTree)
 
+	webGroup.OPTIONS("/projects/:projectId/plans/:planId/changes", h.OptionsTree)
+	webGroup.GET("/projects/:projectId/plans/:planId/changes", middleware.ClerkMiddleware(c.AuthService), h.GetChanges)
+
 	apiGroup.OPTIONS("/upload", h.OptionsProject)
 	apiGroup.POST("/upload", middleware.ApiMiddleware(c.AuthService), h.PostProjectPlan)
 }

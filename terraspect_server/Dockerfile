@@ -1,15 +1,20 @@
-FROM golang:1.22-alpine AS dev
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
 
-RUN apk update && apk add --no-cache git
-
-RUN go mod download
+RUN apk update && apk add --no-cache git \
+    && go mod download
 
 COPY . .
 
-EXPOSE 8000
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o main .
 
-CMD ["go", "run", "."]
+FROM golang:1.22-alpine
+
+WORKDIR /var/task
+
+COPY --from=builder /app/main .
+
+CMD [ "./main" ]

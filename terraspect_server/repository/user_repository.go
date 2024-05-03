@@ -8,6 +8,8 @@ import (
 )
 
 type UserRepository interface {
+	CreateUser(clerkUserId string) error
+	CheckUserExists(clerkUserID string) (bool, error)
 	GetUserFromAPIKey(apiKey string) (model.User, error)
 	AddAPIKey(clerkUserID string, apiKey string, data dto.GenerateApiKeyRequest) error
 	GetAllAPIKeys(clerkUserID string) ([]model.ApiKey, error)
@@ -24,6 +26,31 @@ func NewUserRepository(
 	return &userRepository{
 		db: db,
 	}
+}
+
+func (ur *userRepository) CheckUserExists(clerkUserID string) (bool, error) {
+	var user model.User
+	result := ur.db.Connection().First(&user, "clerk_user_id = ?", clerkUserID)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if user.ClerkUserID == "" {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (ur *userRepository) CreateUser(clerkUserId string) error {
+	newUser := model.User{
+		ClerkUserID: clerkUserId,
+	}
+
+	if err := ur.db.Connection().Create(&newUser).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ur *userRepository) GetUserFromAPIKey(apiKey string) (model.User, error) {
@@ -94,7 +121,7 @@ func (ur *userRepository) GetAllAPIKeys(clerkUserID string) ([]model.ApiKey, err
 func (ur *userRepository) DeleteAPIKey(apiKey string) error {
 	if err := ur.db.Connection().
 		Model(&model.ApiKey{}).
-		Where("key = ?", apiKey).
+		Where("key_value = ?", apiKey).
 		Update("deleted_at", "NOW()").
 		Error; err != nil {
 		return err

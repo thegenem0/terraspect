@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useTreeContext } from '@/contexts/TreeContextProvider'
 
+import ChangesView from '../ChangesView/ChangesView'
 import DetailsView from '../DetailsView/DetailsView'
 
 const DetailsDialog = () => {
@@ -33,7 +34,9 @@ const DetailsDialog = () => {
               <DetailsView activeNode={activeNode} />
             </ScrollArea>
           </TabsContent>
-          <TabsContent value="password">Change your password here.</TabsContent>
+          <TabsContent value="password">
+            <ChangesView activeNode={activeNode} />
+          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>

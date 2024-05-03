@@ -1,6 +1,6 @@
 import { MultiDirectedGraph } from 'graphology'
 
-import { DataNode } from '@/hooks/queries/useGraphQuery'
+import { TreeDataNode } from '@/contexts/TreeContextProvider'
 
 export type GraphNode = {
   id: string
@@ -17,7 +17,7 @@ export type GraphEdge = {
 }
 
 interface BuildGraphProps {
-  data: DataNode[]
+  data: TreeDataNode[]
 }
 
 export const buildGraph = ({ data }: BuildGraphProps) => {
@@ -31,7 +31,7 @@ export const buildGraph = ({ data }: BuildGraphProps) => {
 }
 
 const addNodesRecursively = (
-  node: DataNode,
+  node: TreeDataNode,
   graph: MultiDirectedGraph<GraphNode, GraphEdge>,
   level = 0,
   parentNodeId?: string
