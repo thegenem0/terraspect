@@ -30,5 +30,14 @@
         ]
       }
     ]
+  },
+  "availability-zones:account=211125303136:region=eu-west-2": [
+    "eu-west-2a",
+    "eu-west-2b",
+    "eu-west-2c"
+  ],
+  "hosted-zone:account=211125303136:domainName=terraspect.genem0.com:region=eu-west-2": {
+    "Id": "/hostedzone/Z02392752W5ZRMPPFTSIP",
+    "Name": "terraspect.genem0.com."
   }
 }
