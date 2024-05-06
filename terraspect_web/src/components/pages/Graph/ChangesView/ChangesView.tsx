@@ -72,32 +72,49 @@ const RenderChangeValues = ({ changes }: { changes: ChangeValues }) => {
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border-2 border-black p-2">
-      {changes?.values?.value?.map((variable, idx) => (
-        <div key={idx} className="flex flex-col gap-1">
-          <div className="flex flex-row items-center gap-2">
-            <p>Variable Changed:</p>
-            <pre className="rounded-lg p-2 text-black">{variable.key}</pre>
-          </div>
-          <div className="flex flex-row items-center gap-2 align-middle">
-            {variable.value.map((value, idx) => (
-              <pre
-                key={idx}
-                className="rounded-lg bg-red-200 p-2 text-gray-500"
-              >
-                {JSON.stringify(value, null, 2)}
-              </pre>
-            ))}
-            <ChevronRight size={24} />
-            {variable.prev_value.map((value, idx) => (
-              <div key={idx} className="flex flex-row gap-1">
-                <pre className="rounded-lg bg-green-200 p-2 text-gray-500">
-                  {JSON.stringify(value, null, 2)}
+      {changes?.values?.value?.map((variable, idx) => {
+        console.log('VALUE: ', variable.value)
+        console.log('PREV VALUE: ', variable.prev_value)
+        return (
+          <div key={idx} className="flex flex-col gap-1">
+            <div className="flex flex-row items-center gap-2">
+              <p>Variable Changed:</p>
+              <pre className="rounded-lg p-2 text-black">{variable.key}</pre>
+            </div>
+            <div className="flex flex-row items-center gap-2 align-middle">
+              {typeof variable?.value === 'string' ? (
+                <pre className="rounded-lg bg-red-200 p-2 text-gray-500">
+                  {variable.value}
                 </pre>
-              </div>
-            ))}
+              ) : (
+                variable?.value?.map((value, idx) => (
+                  <pre
+                    key={idx}
+                    className="rounded-lg bg-red-200 p-2 text-gray-500"
+                  >
+                    {JSON.stringify(value, null, 2)}
+                  </pre>
+                ))
+              )}
+              <ChevronRight size={24} />
+              {typeof variable?.prev_value === 'string' ? (
+                <pre className="rounded-lg bg-green-200 p-2 text-gray-500">
+                  {variable.prev_value}
+                </pre>
+              ) : (
+                variable?.prev_value?.map((value, idx) => (
+                  <pre
+                    key={idx}
+                    className="rounded-lg bg-green-200 p-2 text-gray-500"
+                  >
+                    {JSON.stringify(value, null, 2)}
+                  </pre>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

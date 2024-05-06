@@ -43,7 +43,7 @@ export const NewApiKeyValidationSchema = z.object({
   })
 })
 
-const CreateKeyPopover = () => {
+const CreateKey = () => {
   const { mutateAsync } = useGenerateKeyMutation()
 
   const form = useForm<z.infer<typeof NewApiKeyValidationSchema>>({
@@ -106,7 +106,7 @@ const CreateKeyPopover = () => {
   )
 }
 
-export default CreateKeyPopover
+export default CreateKey
 
 type ProjectSelectorProps = {
   form: ReturnType<typeof useForm<z.infer<typeof NewApiKeyValidationSchema>>>

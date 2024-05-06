@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import PageContainer from '@/components/common/PageContainer/PageContainer'
-import CreateKeyPopover from '@/components/pages/Keys/CreateKeyPopover/CreateKeyPopover'
+import CreateKey from '@/components/pages/Keys/CreateKeyPopover/CreateKey'
 import KeysTable from '@/components/pages/Keys/KeysTable/KeysTable'
 import {
   Card,
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card'
 import { useGetKeysQuery } from '@/hooks/queries/useGetKeysQuery'
 
-export const Route = createFileRoute('/__authenticated/keys')({
+export const Route = createFileRoute('/_layout/keys')({
   component: () => <KeysComponent />
 })
 
@@ -28,7 +28,7 @@ const KeysComponent = () => {
               <CardTitle>API Keys</CardTitle>
               <CardDescription>Manage your API keys here.</CardDescription>
             </div>
-            <CreateKeyPopover />
+            <CreateKey />
           </CardHeader>
           <CardContent>
             <KeysTable data={data?.keys} />

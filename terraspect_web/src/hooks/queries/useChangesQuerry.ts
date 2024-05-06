@@ -32,8 +32,8 @@ export type ChangeValues = {
 
 type ChangeVariableType = {
   key: string
-  value: ComplexVariable[]
-  prev_value: ComplexVariable[]
+  value: ComplexVariable[] | string
+  prev_value: ComplexVariable[] | string
 }
 
 type ChangesQueryParams = {

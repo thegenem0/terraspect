@@ -20,6 +20,14 @@ interface BuildGraphProps {
   data: TreeDataNode[]
 }
 
+const nodeColors = {
+  purple: '#7B42BC',
+  red: '#97454d',
+  blue: '#132e65',
+  green: '#168581',
+  gray: '#757687'
+}
+
 export const buildGraph = ({ data }: BuildGraphProps) => {
   const graph = new MultiDirectedGraph<GraphNode, GraphEdge>()
 
@@ -42,7 +50,7 @@ const addNodesRecursively = (
     y: Math.random(),
     size: calculateNodeSize(level),
     label: node.label,
-    color: getNodeColor(level),
+    color: getNodeColor(level, node.changes && node.changes.length > 0),
     highlighted: false
   })
 
@@ -64,9 +72,10 @@ const calculateNodeSize = (level: number) => {
   return baseSize / (level * level)
 }
 
-const getNodeColor = (level: number) => {
-  if (level === 0) return 'red'
-  if (level === 1) return 'blue'
-  if (level === 2) return 'green'
-  return 'grey'
+const getNodeColor = (level: number, hasChange?: boolean) => {
+  if (hasChange) return nodeColors.red
+  if (level === 0) return nodeColors.purple
+  if (level === 1) return nodeColors.blue
+  if (level === 2) return nodeColors.green
+  return nodeColors.gray
 }

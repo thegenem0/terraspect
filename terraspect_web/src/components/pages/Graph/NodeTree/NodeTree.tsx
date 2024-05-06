@@ -88,7 +88,7 @@ const SigmaActions = () => {
   const { assign: assignCircular } = useLayoutCircular()
 
   return (
-    <ControlsContainer position="top-left" className="absolute left-10 top-20">
+    <ControlsContainer position="top-left" className="absolute left-20 top-28">
       <div className="flex flex-row items-center gap-2">
         <Button variant="destructive" onClick={() => assignCircular()}>
           Reset
@@ -109,6 +109,35 @@ const SigmaActions = () => {
   )
 }
 
+const LegendContaier = () => {
+  return (
+    <div className="absolute bottom-20 left-20">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-center gap-2">
+          <div className="size-4 rounded-full bg-ts-purple"></div>
+          <span>Root Node</span>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <div className="size-4 rounded-full bg-ts-blue"></div>
+          <span>Module Node</span>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <div className="size-4 rounded-full bg-ts-green"></div>
+          <span>Module Child Node</span>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <div className="size-4 rounded-full bg-ts-dark-gray"></div>
+          <span>Sub-Module Node</span>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <div className="size-4 rounded-full bg-ts-light-red"></div>
+          <span>Node with changes</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const GraphContainer = () => {
   return (
     <div className="size-full">
@@ -120,9 +149,10 @@ const GraphContainer = () => {
       >
         <SetupGraph />
         <SigmaActions />
+        <LegendContaier />
         <ControlsContainer
           position="top-right"
-          className="absolute right-10 top-20"
+          className="absolute right-20 top-28"
         >
           <SearchControl className="overflow-hidden rounded-lg border-2 border-black bg-white px-2 py-1 outline-none" />
         </ControlsContainer>

@@ -23,7 +23,7 @@ export const useAllProjectsQuery = (): UseQueryResult<ProjectsResponse> => {
   }
 
   return useQuery({
-    queryKey: ['tree'],
+    queryKey: ['projects'],
     queryFn: getData
   })
 }

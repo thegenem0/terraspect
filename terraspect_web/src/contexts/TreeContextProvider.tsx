@@ -14,6 +14,7 @@ import { mergeChangesForModule } from '@/lib/mergeChangesForModule'
 
 export type TreeContext = {
   treeData: TreeDataNode[]
+  isLoading?: boolean
   activeNode: TreeDataNode | undefined
   hoveredNodeId: string | undefined
   toggleActiveNodeById: (id: string) => void
@@ -38,6 +39,7 @@ type Props = {
 export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
   const [activeNode, setActiveNode] = useState<TreeDataNode | undefined>()
   const [hoveredNodeId, setHoveredNodeId] = useState<string | undefined>()
+  const [isLoading, setIsLoading] = useState(true)
 
   const queryClient = useQueryClient()
 
@@ -104,6 +106,11 @@ export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
 
   const treeContext = {
     treeData: treeDataNodes,
+    isLoading:
+      queryLoading ||
+      queryFetching ||
+      changesQueryLoading ||
+      changesQueryFetching,
     activeNode,
     hoveredNodeId,
     toggleActiveNodeById,
@@ -111,14 +118,14 @@ export const TreeContextProvider = ({ projectId, planId, children }: Props) => {
     refreshTree
   }
 
-  if (
-    queryLoading ||
-    queryFetching ||
-    changesQueryLoading ||
-    changesQueryFetching
-  ) {
-    return <div>Loading...</div>
-  }
+  // if (
+  //   queryLoading ||
+  //   queryFetching ||
+  //   changesQueryLoading ||
+  //   changesQueryFetching
+  // ) {
+  //   return <div>Loading...</div>
+  // }
 
   return (
     <TreeContext.Provider value={treeContext}>{children}</TreeContext.Provider>

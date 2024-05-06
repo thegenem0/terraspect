@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-hot-toast'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -41,9 +42,14 @@ const NewProject = () => {
   })
 
   function onSubmit(values: z.infer<typeof NewProjectValidationSchema>) {
-    mutateAsync(values).then(() => {
-      form.reset()
-    })
+    mutateAsync(values)
+      .then(() => {
+        form.reset()
+        toast.success('Project created')
+      })
+      .catch(() => {
+        toast.error('Failed to create project')
+      })
   }
 
   return (

@@ -11,16 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as authenticatedImport } from './routes/__authenticated'
+import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
-import { Route as authenticatedProjectsImport } from './routes/__authenticated/projects'
-import { Route as authenticatedKeysImport } from './routes/__authenticated/keys'
-import { Route as authenticatedGraphImport } from './routes/__authenticated/graph'
+import { Route as LayoutProjectsImport } from './routes/_layout/projects'
+import { Route as LayoutKeysImport } from './routes/_layout/keys'
+import { Route as LayoutGraphImport } from './routes/_layout/graph'
 
 // Create/Update Routes
 
-const authenticatedRoute = authenticatedImport.update({
-  id: '/__authenticated',
+const LayoutRoute = LayoutImport.update({
+  id: '/_layout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -29,19 +29,19 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const authenticatedProjectsRoute = authenticatedProjectsImport.update({
+const LayoutProjectsRoute = LayoutProjectsImport.update({
   path: '/projects',
-  getParentRoute: () => authenticatedRoute,
+  getParentRoute: () => LayoutRoute,
 } as any)
 
-const authenticatedKeysRoute = authenticatedKeysImport.update({
+const LayoutKeysRoute = LayoutKeysImport.update({
   path: '/keys',
-  getParentRoute: () => authenticatedRoute,
+  getParentRoute: () => LayoutRoute,
 } as any)
 
-const authenticatedGraphRoute = authenticatedGraphImport.update({
+const LayoutGraphRoute = LayoutGraphImport.update({
   path: '/graph',
-  getParentRoute: () => authenticatedRoute,
+  getParentRoute: () => LayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -52,21 +52,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/__authenticated': {
-      preLoaderRoute: typeof authenticatedImport
+    '/_layout': {
+      preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/__authenticated/graph': {
-      preLoaderRoute: typeof authenticatedGraphImport
-      parentRoute: typeof authenticatedImport
+    '/_layout/graph': {
+      preLoaderRoute: typeof LayoutGraphImport
+      parentRoute: typeof LayoutImport
     }
-    '/__authenticated/keys': {
-      preLoaderRoute: typeof authenticatedKeysImport
-      parentRoute: typeof authenticatedImport
+    '/_layout/keys': {
+      preLoaderRoute: typeof LayoutKeysImport
+      parentRoute: typeof LayoutImport
     }
-    '/__authenticated/projects': {
-      preLoaderRoute: typeof authenticatedProjectsImport
-      parentRoute: typeof authenticatedImport
+    '/_layout/projects': {
+      preLoaderRoute: typeof LayoutProjectsImport
+      parentRoute: typeof LayoutImport
     }
   }
 }
@@ -75,10 +75,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
-  authenticatedRoute.addChildren([
-    authenticatedGraphRoute,
-    authenticatedKeysRoute,
-    authenticatedProjectsRoute,
+  LayoutRoute.addChildren([
+    LayoutGraphRoute,
+    LayoutKeysRoute,
+    LayoutProjectsRoute,
   ]),
 ])
 

@@ -33,6 +33,14 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --ts-blue: #132e65;
+    --ts-green: #168581;
+    --ts-purple: #7B42BC;
+    --ts-light-gray: #a9aabc;
+    --ts-dark-gray: #757687;
+    --ts-dark-red: #601221;
+    --ts-light-red: #97454d;
   }
 
   .dark {

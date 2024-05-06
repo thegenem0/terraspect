@@ -17,7 +17,17 @@ const config = {
         '2xl': '1400px'
       }
     },
+    minHeight: {
+      0: '0',
+      '1/4': '25vh',
+      '1/2': '50vh',
+      '3/4': '75vh',
+      screen: '100vh'
+    },
     extend: {
+      backgroundImage: {
+        default: "url('/terraspect-bg.svg')"
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -51,7 +61,14 @@ const config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
-        }
+        },
+        'ts-blue': 'var(--ts-blue)',
+        'ts-green': 'var(--ts-green)',
+        'ts-purple': 'var(--ts-purple)',
+        'ts-light-gray': 'var(--ts-light-gray)',
+        'ts-dark-gray': 'var(--ts-dark-gray)',
+        'ts-dark-red': 'var(--ts-dark-red)',
+        'ts-light-red': 'var(--ts-light-red)'
       },
       borderRadius: {
         lg: 'var(--radius)',

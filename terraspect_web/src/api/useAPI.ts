@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { env } from '@/env'
+
 type ApiProps = {
   jwt: string | null
 }
@@ -8,7 +10,7 @@ type GetJWT = () => Promise<string | null>
 
 const terraspectAPI = ({ jwt }: ApiProps) =>
   axios.create({
-    baseURL: `http://localhost:8000/api/web/v1`,
+    baseURL: `${env.VITE_API_BASE_URI}/api/web/v1`,
     timeout: 10000,
     headers: {
       Authorization: `Bearer ${jwt}`
