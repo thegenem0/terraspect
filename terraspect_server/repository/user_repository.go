@@ -32,7 +32,7 @@ func (ur *userRepository) CheckUserExists(clerkUserID string) (bool, error) {
 	var user model.User
 	result := ur.db.Connection().First(&user, "clerk_user_id = ?", clerkUserID)
 	if result.Error != nil {
-		return false, result.Error
+		return false, nil
 	}
 
 	if user.ClerkUserID == "" {
@@ -121,7 +121,7 @@ func (ur *userRepository) GetAllAPIKeys(clerkUserID string) ([]model.ApiKey, err
 func (ur *userRepository) DeleteAPIKey(apiKey string) error {
 	if err := ur.db.Connection().
 		Model(&model.ApiKey{}).
-		Where("key_value = ?", apiKey).
+		Where("key = ?", apiKey).
 		Update("deleted_at", "NOW()").
 		Error; err != nil {
 		return err

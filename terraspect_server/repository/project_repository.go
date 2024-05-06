@@ -97,7 +97,23 @@ func (pr *projectRepository) UpdateProject(project model.Project) error {
 }
 
 func (pr *projectRepository) DeleteProject(projectID string) error {
-	result := pr.db.Connection().Delete(&model.Project{}, projectID)
+	project := model.Project{
+		Base: model.Base{
+			ID: projectID,
+		},
+	}
+
+	plans := pr.db.Connection().Where("project_id = ?", projectID).Delete(&model.Plan{})
+	if plans.Error != nil {
+		return plans.Error
+	}
+
+	apiKeys := pr.db.Connection().Where("project_id = ?", projectID).Delete(&model.ApiKey{})
+	if apiKeys.Error != nil {
+		return apiKeys.Error
+	}
+
+	result := pr.db.Connection().Delete(&project)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -140,6 +156,20 @@ func (pr *projectRepository) AddPlanToProject(projectID string, plan model.Plan)
 
 	plan.ProjectID = project.ID
 	result = pr.db.Connection().Create(&plan)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (pr *projectRepository) DeletePlan(planID string) error {
+	plan := model.Plan{
+		Base: model.Base{
+			ID: planID,
+		},
+	}
+	result := pr.db.Connection().Delete(&plan)
 	if result.Error != nil {
 		return result.Error
 	}

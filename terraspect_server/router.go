@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/thegenem0/terraspect_server/docs"
@@ -36,6 +37,16 @@ func InitRouter(modules *Modules) (*gin.Engine, error) {
 	projectService := service.NewProjectService(projectRepo)
 
 	router := gin.Default()
+
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+	}
+
+	router.Use(cors.New(corsConfig))
+
 	docs.SwaggerInfo.BasePath = "/api"
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -105,6 +105,26 @@ func (h *Handler) PostProject(c *gin.Context) {
 	})
 }
 
+func (h *Handler) DeleteProject(c *gin.Context) {
+	projectId := c.Param("projectId")
+
+	err := h.ProjectService.DeleteProject(projectId)
+	if err != nil {
+		apiErr := apierror.NewAPIError(
+			apierror.InternalServerError,
+			"Failed to delete project",
+		)
+		c.JSON(apiErr.Status(), gin.H{
+			"error": apiErr,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Project deleted",
+	})
+}
+
 func (h *Handler) GetProjectPlans(c *gin.Context) {
 	projectId := c.Param("projectId")
 
