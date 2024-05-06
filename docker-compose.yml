@@ -26,9 +26,8 @@ services:
       - DATABASE_HOST=postgres
       - DATABASE_NAME=terraspect_db
       - DATABASE_USER=terraspect_root
-      - DATABASE_PASSWORD=SuperSecretPassword
-      - CLERK_API_KEY=sk_test_C4jQKHoPofreWyMpz3oV3sR3rkEUy7nPAX6CJpEsPR
-      - CLERK_JWKS_URL=https://tops-weasel-19.clerk.accounts.dev/.well-known/jwks.json
+      - DATABASE_PASSWORD=<DATABASE_PASSWORD>
+      - CLERK_API_KEY=<CLERK_API_KEY>
     depends_on:
       - postgres
     networks:
