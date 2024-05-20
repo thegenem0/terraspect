@@ -86,6 +86,18 @@ func (as *authService) GetUserID(token string) (string, error) {
 		return "", err
 	}
 
+	userExists, err := as.userRepository.CheckUserExists(userData.ID)
+	if err != nil {
+		return "", err
+	}
+
+	if !userExists {
+		err = as.userRepository.CreateUser(userData.ID)
+		if err != nil {
+			return "", err
+		}
+	}
+
 	as.userData = userData
 
 	return userData.ID, nil
